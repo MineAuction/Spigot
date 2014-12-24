@@ -5,11 +5,13 @@ import cz.sognus.mineauction.utils.Chat;
 import cz.sognus.mineauction.utils.Lang;
 import cz.sognus.mineauction.utils.Log;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import org.bukkit.plugin.java.JavaPlugin;
 
+/**
+* 
+* @author Sognus
+* 
+*/
 public class MineAuction extends JavaPlugin {
 	
 	public static String version;
@@ -17,26 +19,30 @@ public class MineAuction extends JavaPlugin {
 	
 	public static MineAuction plugin;
 	public static Config config;
-	public static Chat chat;
+	public static Lang lang;
+	
 	public static Log logger;
+	public static Chat chat;
 	
 	@Override
 	public void onEnable()
 	{
-		plugin = this;
-		config = new Config(this);
-		
 		name = this.getDescription().getName();
 		version = this.getDescription().getVersion();
 		
-		Logger.getLogger("Minecraft").log(Level.INFO, String.format("This server is running %s version %s", name, version));
+		plugin = this;
+		config = new Config(this);
+		lang = new Lang(this);
 		
-		
+		Log.debug("This plugin is now running in debug mode");
+		Log.debug("Main class: "+this.getClass().getName());	
 	}
 	
 	public void onReload()
 	{
 		// Stop all task, clear all variables then load them again
+		onDisable();
+		onEnable();
 	}
 	
 	public void onDiable()

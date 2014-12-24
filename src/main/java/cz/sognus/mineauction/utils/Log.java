@@ -5,6 +5,12 @@ import java.util.logging.Logger;
 
 import cz.sognus.mineauction.MineAuction;
 
+/**
+* This class outputs messages to log.  
+*
+* @author Sognus
+* 
+*/
 public class Log {
 	
 	private static final Logger logg = Logger.getLogger("Minecraft");
@@ -17,12 +23,13 @@ public class Log {
 	public static void error(String message)
 	{
 		logg.log(Level.SEVERE, String.format("%s %s", "[MineAuction]", message));
+		MineAuction.plugin.onDiable();
 	}
 	
 	public static void debug(String message)
 	{
-		if(Config.Debug) 
-			logg.log(Level.INFO, String.format("%s %s", "[MineAuction]", message));
+		if(MineAuction.config.getBool("debug"))
+			logg.log(Level.INFO, String.format("%s%s %s", "[MineAuction]","[Debug]", message));
 	}
 	
 	public static void warning(String message)

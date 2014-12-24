@@ -4,27 +4,25 @@ import cz.sognus.mineauction.MineAuction;
 
 import org.bukkit.configuration.Configuration;
 
+/**
+* This class provides access to plugin configuration. 
+*
+* @author Sognus
+* 
+*/
 public class Config {
+	
+	@SuppressWarnings("unused")
 	private MineAuction plugin;
 	private Configuration config;
-	
-	public static boolean Debug;
-	
-	// Udìlat podobnou vìc jako u lang
-	
 	
 	public Config(MineAuction plugin)
 	{
 		this.plugin = plugin;
 		
-		this.config = plugin.getConfig().getRoot();
+		config = plugin.getConfig().getRoot();
 		config.options().copyDefaults(true);
-	}
-	
-	
-	public void Load()
-	{
-		
+		plugin.saveConfig();
 	}
 	
 	public String getString(String key)

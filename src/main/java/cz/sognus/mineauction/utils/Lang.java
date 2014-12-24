@@ -1,102 +1,141 @@
 package cz.sognus.mineauction.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
 
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.yaml.snakeyaml.Yaml;
 
 import cz.sognus.mineauction.MineAuction;
 
+/**
+* This class manage language files. 
+*
+* @author Sognus
+* 
+*/
 public class Lang {
 	
-	private HashMap<String, String> messages = new HashMap<String, String>();
+	private HashMap<String, Object> messages = new HashMap<String, Object>();;
 	
 	private MineAuction plugin;
-	private String language;
-
+	private String lang;
+	
 	public Lang(MineAuction plugin)
 	{
 		this.plugin = plugin;
 		this.copyLanguageFiles();
-		this.loadLang(plugin.config.getString("lang"));
-			
+		this.lang = MineAuction.config.getString("lang");
+		this.loadLang();		
 	}
 	
-	// Should load all language rows
-	public void loadLang(String lang)
+	@SuppressWarnings("unchecked")
+	public void loadLang()
 	{
 		try
 		{
-			File file = new File(plugin.getDataFolder().toString()+File.separator+"lang"+File.separator+lang+".yml");
-			if(file.exists())
-			{
-				FileConfiguration langConfig = YamlConfiguration.loadConfiguration(file);
-				for(String key : langConfig.getStringList("Main"))
-				{
-					messages.put(key, langConfig.getString("Main."+key));
-					
-					// Debug
-					Log.debug("Loaded lang key :" +key);
-				}
-			}
+			Yaml yaml = new Yaml();
+			File file = new File(plugin.getDataFolder()+"/lang/"+lang+".yml");
+			InputStream is = new FileInputStream(file);
+			Map<String,Object> result = (Map<String,Object>)yaml.load(is);
+			messages.putAll(result);
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
+		}
+	}
+
+	
+	public void copyLanguageFiles()
+	{
+		File langFolder = new File(plugin.getDataFolder() + "/lang/");
+		if(!langFolder.exists()) langFolder.mkdirs();
+		
+		try
+		{
+			JarFile jarFile = new JarFile(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+
+		    for(Enumeration<JarEntry> em = jarFile.entries(); em.hasMoreElements();)
+		    {  
+		        String s= em.nextElement().toString();
+
+		        if(s.startsWith("lang/"))
+		        {
+		            ZipEntry entry = jarFile.getEntry(s);
+
+		            String fileName = s.substring(s.lastIndexOf("/")+1, s.length());
+		            
+		            if(fileName.endsWith(".yml"))
+		            {
+		                
+		            	File eFile = new File(plugin.getDataFolder()+"/lang/"+fileName);
+		                if(eFile.exists()) continue;
+		            	
+		            	InputStream inStream= jarFile.getInputStream(entry);
+		                OutputStream out = new FileOutputStream(plugin.getDataFolder()+"/lang/"+fileName);
+		                
+		                int c;
+		                
+		                while ((c = inStream.read()) != -1)
+		                {
+		                    out.write(c);
+		                }
+		                inStream.close();
+		                out.close();
+
+		            }
+		        }
+		    }  
+		    jarFile.close();
 			
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+			Log.warning("Unable to copy language files");
 		}
 		
 	}
 	
-	public void copyLanguageFiles()
+	@SuppressWarnings("unchecked")
+	public String getString(String key)
 	{
 		try
 		{
-			File extFolder = new File(plugin.getDataFolder()+"/lang/");
-			if(!extFolder.exists()) extFolder.mkdirs();
 			
+			Yaml yaml = new Yaml();
+			File file = new File(plugin.getDataFolder()+"/lang/"+lang+".yml");
+			InputStream is = new FileInputStream(file);
+			Map<String,Object> data = (Map<String,Object>)yaml.load(is);
 			
-			File folder = new File(plugin.getClass().getResource("/lang/").getPath());
-			File[] arrayFile = folder.listFiles();
+			if(messages.get(key) != null) return Chat.Format((String)messages.get(key));
 			
-			for(File f : arrayFile)
-			{
-				if(f.isFile())
-				{
-					File extFile = new File(plugin.getDataFolder()+"/lang/"+f.getName());
-					if(extFile.exists()) continue; 
-						
-					extFile.createNewFile(); 
-					
-					InputStream is = plugin.getClass().getResourceAsStream("/lang/"+f.getName());
-					FileOutputStream os = new FileOutputStream(new File(plugin.getDataFolder()+"/lang/"+f.getName()));
-					
-					while(is.available()>0)
-					{
-						os.write(is.read());
-					}
-					
-					is.close();
-					os.close();
-				}
-			}
+			FileWriter writer = new FileWriter(file);
+			data.put(key, "<<Required content not found>>");
+			yaml.dump(data, writer);
 			
+			return "<<Required content not found>>";
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
+			Log.warning("Tady to nefachaje");
 			
 		}
-	}
-	
-	
-	public String getString(String key)
-	{
-		if(!messages.containsKey(key)) return "<<Message not found>>";
-		String output = messages.get(key);
-		if(output != null || !output.isEmpty()) return output;
-		return "<<Message not found>>";
+		
+		Log.warning("An error occurred while trying to get language content");
+		return "<<An error occurred while trying to get language content>>";
+		
 	}
 
 }
