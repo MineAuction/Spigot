@@ -118,7 +118,7 @@ public class Lang {
 			InputStream is = new FileInputStream(file);
 			Map<String,Object> data = (Map<String,Object>)yaml.load(is);
 			
-			if(messages.get(key) != null) return Chat.Format((String)messages.get(key));
+			if(messages.get(key) != null) return (String) messages.get(key);
 			
 			FileWriter writer = new FileWriter(file);
 			data.put(key, "<<Required content not found>>");
@@ -129,8 +129,6 @@ public class Lang {
 		catch(Exception e)
 		{
 			e.printStackTrace();
-			Log.warning("Tady to nefachaje");
-			
 		}
 		
 		Log.warning("An error occurred while trying to get language content");

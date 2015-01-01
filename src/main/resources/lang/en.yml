@@ -4,4 +4,24 @@
 #									
 ################################################################
 
-SomeText: "{blue}This text is blue, thats fine isn't it?"
+no_permission: "You don't have permission to do that."
+no_cheat: "Hey, don't cheat!"
+
+auction_using: "Auction inventory already opened!"
+auction_loading: "Opening inventory..."
+auction_saving: "Inventory closed and saved." 
+
+sign_create: "Auction point created."
+sign_create_deposit: "Deposit auction point created."
+sign_create_withdraw: "Withdraw auction point created."
+sign_removed: "Auction sign removed."
+sign_invalid: "Invalid sign! Check official site for more information."
+
+inventory_title_deposit: "[MineAuction] Deposit"
+inventory_title_withdraw: "[MineAuction] Withdraw"
+inventory_title_mailbox: "[MineAuction] MailBox"
+inventory_title_invalid: "Invalid inventory type"
+
+account_created: "MineAuction account created."
+account_passwordchange: "MineAuction password changed."
+account_register: "You have to create MineAuction account before you can use this sign!"

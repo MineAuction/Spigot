@@ -4,12 +4,13 @@
 #
 ################################################################
 
-debug: false
-lang: "cz" 
+debug: true
+lang: "en"
+
 
 mysql:
   host: "localhost"
   port: "3306"
-  database: "db"
-  user: "User"
-  password: "pass"
+  database: "minecraft"
+  user: "minecraft"
+  password: "1234"
