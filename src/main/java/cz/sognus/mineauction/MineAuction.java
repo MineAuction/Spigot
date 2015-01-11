@@ -2,6 +2,7 @@ package cz.sognus.mineauction;
 
 import cz.sognus.mineauction.database.Database;
 import cz.sognus.mineauction.listeners.MineAuctionBlockListener;
+import cz.sognus.mineauction.listeners.MineAuctionInventoryListener;
 import cz.sognus.mineauction.listeners.MineAuctionPlayerListener;
 import cz.sognus.mineauction.utils.Config;
 import cz.sognus.mineauction.utils.Lang;
@@ -37,10 +38,13 @@ public class MineAuction extends JavaPlugin {
 		plugin = this;
 		config = new Config(this);
 		lang = new Lang(this);
+		
 		db = new Database(this);
+		db.openConnection();
 		
 		getServer().getPluginManager().registerEvents(new MineAuctionBlockListener(this), this);
 		getServer().getPluginManager().registerEvents(new MineAuctionPlayerListener(this), this);
+		getServer().getPluginManager().registerEvents(new MineAuctionInventoryListener(this), this);
 		
 		Log.debug("This plugin is now running in debug mode");
 		Log.debug("Main class: "+this.getClass().getName());	
@@ -54,6 +58,7 @@ public class MineAuction extends JavaPlugin {
 	
 	public void onDiable()
 	{
+		WebInventory.forceCloseAll();
 	}
 	
 	

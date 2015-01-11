@@ -21,6 +21,7 @@ import cz.sognus.mineauction.MineAuction;
 */
 public class MineAuctionBlockListener implements Listener {
 	
+	@SuppressWarnings("unused")
 	private final MineAuction plugin;
 	
 	public MineAuctionBlockListener(MineAuction plugin)

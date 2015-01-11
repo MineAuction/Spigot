@@ -2,6 +2,7 @@ package cz.sognus.mineauction.listeners;
 
 import net.md_5.bungee.api.ChatColor;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,6 +13,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+
 import cz.sognus.mineauction.MineAuction;
 import cz.sognus.mineauction.WebInventory;
 
@@ -29,10 +31,6 @@ public class MineAuctionPlayerListener implements Listener {
 		this.plugin = plugin;
 	}
 	
-	// Player insert inventory
-	
-	// Player output inventory
-	
 	// Player interact with auction sign
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerInteract(PlayerInteractEvent e)
@@ -44,13 +42,12 @@ public class MineAuctionPlayerListener implements Listener {
 		if(b == null) return;
 		if(b.getType() != Material.SIGN_POST && b.getType() != Material.WALL_SIGN) return;
 		
-		Sign s = (Sign) b.getState();
+		final Sign s = (Sign) b.getState();
 		
 		if(!s.getLine(0).equals("[MineAuction]")) return;
 		e.setCancelled(true);
 		
-		Player p = e.getPlayer();
-		String playerName = p.getName();
+		final Player p = e.getPlayer();
 		
 		if(s.getLine(1).equals("MailBox") || s.getLine(1).equals("Withdraw") || s.getLine(1).equals("Deposit"))
 		{
@@ -66,14 +63,13 @@ public class MineAuctionPlayerListener implements Listener {
 				return;
 			}
 			
-            //Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
-            //    @Override
-            //    public void run() {
-            //       // open inventory  
-            //    }
-            //});
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
+                @Override
+                public void run() {
+                   WebInventory.onInventoryOpen(p, s.getLine(1)); 
+                }
+            });
 			
-			WebInventory w = new WebInventory(p, s.getLine(1));
 			
             return;
 			

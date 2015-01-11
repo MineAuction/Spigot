@@ -11,6 +11,6 @@ lang: "en"
 mysql:
   host: "localhost"
   port: "3306"
-  database: "minecraft"
+  database: "mineauction"
   user: "minecraft"
   password: "1234"

@@ -60,7 +60,8 @@ public class Database
     }
 
     public Connection getConnection() {
-        return connection;
+        openConnection();
+    	return connection;
     }
 
     public void closeConnection() {

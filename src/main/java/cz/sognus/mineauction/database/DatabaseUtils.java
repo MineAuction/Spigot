@@ -7,17 +7,20 @@ import java.util.UUID;
 
 import cz.sognus.mineauction.MineAuction;
 
+/**
+ * 
+ * @author Sognus
+ */
 public class DatabaseUtils {
 
 	public static boolean playerRegistered(UUID playerUUID)
 	{
-		Connection con = MineAuction.db.getConnection();
-		PreparedStatement ps = null;
 		boolean registered = false;
 		
 		try
 		{
-			ps = con.prepareStatement("SELECT COUNT(*) FROM ma_players WHERE uuid = ?");
+			Connection con = MineAuction.db.getConnection();
+			PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) FROM ma_players WHERE uuid = ?");
 			ps.setString(1, playerUUID.toString());
 			ResultSet rs = ps.executeQuery();
 			
@@ -26,6 +29,9 @@ public class DatabaseUtils {
 				registered = rs.getInt(1) == 1 ? true : false;
 				return registered;
 			}
+			
+			ps.close();
+			rs.close();
 			
 			
 		}
@@ -57,7 +63,6 @@ public class DatabaseUtils {
 				output = rs.getInt("id");
 			}
 			
-			conn.close();
 			rs.close();
 			st.close();
 			

@@ -17,6 +17,8 @@ sign_create_withdraw: "Withdraw auction point created."
 sign_removed: "Auction sign removed."
 sign_invalid: "Invalid sign! Check official site for more information."
 
+action_invalid: "This action cannot be performed."
+
 inventory_title_deposit: "[MineAuction] Deposit"
 inventory_title_withdraw: "[MineAuction] Withdraw"
 inventory_title_mailbox: "[MineAuction] MailBox"

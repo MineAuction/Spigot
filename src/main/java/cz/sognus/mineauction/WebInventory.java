@@ -10,8 +10,10 @@ import java.util.UUID;
 import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import cz.sognus.mineauction.database.DatabaseUtils;
 import cz.sognus.mineauction.utils.Log;
@@ -39,12 +41,14 @@ public class WebInventory {
 		this.inventory = Bukkit.createInventory(null, 54, inventoryTitle);
 		
 		// Load it
-		this.loadInventory();
+		//this.loadInventory();
+		this.inventory.setItem(0, new ItemStack(Material.DIAMOND, 64));
 		
 		// open it
 		this.player.openInventory(this.inventory);
 	}
 	
+	// Load items to inventory
 	public void loadInventory()
 	{
 		Connection conn = MineAuction.db.getConnection();
@@ -58,6 +62,7 @@ public class WebInventory {
 			st.setInt(2, inventory.getSize());
 			
 			// done loading
+			// solve item meta
 			// set lore about item qty
 			
 		}
@@ -68,6 +73,7 @@ public class WebInventory {
 		
 	}
 	
+	// Get inventory type
 	public String getInventoryType(String invType)
 	{
 		String inventoryTitle;
@@ -149,7 +155,7 @@ public class WebInventory {
 		
 		synchronized(openInvs)
 		{
-			if(openInvs.containsKey(playerName)) return;
+			if(!openInvs.containsKey(playerName)) return;
 			openInvs.remove(playerName);
 			setLocked(playerUUID, false);
 		}
@@ -157,6 +163,7 @@ public class WebInventory {
 		player.sendMessage(MineAuction.prefix + ChatColor.GREEN + MineAuction.lang.getString("auction_saving"));
 	}
 	
+	// Close all inventories
 	public static void forceCloseAll()
 	{
 		if(openInvs==null || openInvs.size()==0) return;
@@ -168,6 +175,7 @@ public class WebInventory {
 		}		
 	}
 	
+	// Set locked in database
 	public static void setLocked(UUID playerUUID, boolean locked)
 	{
 		if(playerUUID == null) throw new NullPointerException();
@@ -179,7 +187,7 @@ public class WebInventory {
 		
 		try
 		{
-			st = connection.prepareStatement("UPDATE wa_player set locked= ? WHERE uuid= ? ");
+			st = connection.prepareStatement("UPDATE ma_players set locked= ? WHERE uuid= ? ");
 			st.setInt(1, lock);
 			st.setString(2 ,playerUUID.toString());
 			st.executeUpdate();
