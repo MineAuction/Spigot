@@ -3,7 +3,17 @@ package cz.sognus.mineauction.database;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
+import java.util.Map.Entry;
+
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.json.simple.JSONObject;
+
+import com.google.gson.JsonIOException;
 
 import cz.sognus.mineauction.MineAuction;
 
@@ -77,6 +87,13 @@ public class DatabaseUtils {
 		return output;
 		
 	}
+	
+	public static String decodeMetadata(ItemStack i)
+	{
+		return i.serialize().toString();
+	}
+	
+	
 
 }
 

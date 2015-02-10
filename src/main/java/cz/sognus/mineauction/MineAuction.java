@@ -7,8 +7,8 @@ import cz.sognus.mineauction.listeners.MineAuctionPlayerListener;
 import cz.sognus.mineauction.utils.Config;
 import cz.sognus.mineauction.utils.Lang;
 import cz.sognus.mineauction.utils.Log;
-import net.md_5.bungee.api.ChatColor;
 
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**

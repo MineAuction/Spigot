@@ -182,11 +182,11 @@ public class WebInventory {
 		
 		int lock = locked ? 1 : 0;
 		
-		Connection connection = MineAuction.db.getConnection();
-		PreparedStatement st = null;
-		
 		try
 		{
+			Connection connection = MineAuction.db.getConnection();
+			PreparedStatement st = null;
+			
 			st = connection.prepareStatement("UPDATE ma_players set locked= ? WHERE uuid= ? ");
 			st.setInt(1, lock);
 			st.setString(2 ,playerUUID.toString());

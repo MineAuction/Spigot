@@ -1,5 +1,8 @@
 package cz.sognus.mineauction.listeners;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
@@ -15,6 +18,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import cz.sognus.mineauction.MineAuction;
 import cz.sognus.mineauction.WebInventory;
+import cz.sognus.mineauction.utils.Log;
 
 @SuppressWarnings("unused")
 public class MineAuctionInventoryListener implements Listener {
@@ -46,45 +50,53 @@ public class MineAuctionInventoryListener implements Listener {
 	}
 	
 	
-	// MineAuction inventory withdraw event
+	// MineAuction inventory click event
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void onInventoryWithdraw(InventoryClickEvent event)
-	{	
-		Player player = (Player) event.getWhoClicked();
-		PlayerInventory playerInventory = event.getWhoClicked().getInventory();
-		Inventory clickedInventory = event.getClickedInventory();
-		
-		// MineAuction inventory
-		if(!clickedInventory.getTitle().startsWith("[MineAuction]")) return;
-		
-		// Invalid auction type
-		if(clickedInventory.getTitle().endsWith("Deposit"))
-		{
-			event.setCancelled(true);
-			player.sendMessage(MineAuction.prefix + ChatColor.RED + MineAuction.lang.getString("action_invalid"));
-			return;
-		}
+	public void onInventoryClick(InventoryClickEvent event)
+	{
+		if(!event.getInventory().getTitle().contains("[MineAuction]")) return;
+		if(event.getClickedInventory() == null) return;
 		
 		event.setCancelled(true);
 		
-		//
-		// Run async task to withdraw inventory from database
-		//
-		//
+		Inventory inventory = event.getInventory();
+		Inventory clickedInventory = event.getClickedInventory();
 		
-		// Temp debug
-		String tempMessage = "Item withdraw action";
-		player.sendMessage(MineAuction.prefix + ChatColor.RED + tempMessage);
+		if(clickedInventory.getTitle().startsWith("[MineAuction]"))
+		{
+			onWithdraw(event);
+		}
+		else
+		{
+			onDeposit(event);
+		}
+		
+		
+		
+		
 	}
 	
-	
-	
-	// MineAuction inventory deposit event
-	@EventHandler(priority = EventPriority.NORMAL)
-	public void onInventoryDeposit(InventoryClickEvent event)
+	// placeholder method -> it is planed to move it into WebInventory class
+	public static void onDeposit(InventoryClickEvent event)
 	{
-		Player p = (Player) event.getWhoClicked();
+		Log.info("Attempt to deposit items to database");
+		
+		Map<String, Object> map = event.getCurrentItem().getItemMeta().serialize();
+		String vystup = "";
+		
+		for(Entry<String, Object> entry : map.entrySet())
+		{
+			String key = entry.getKey();
+			Object val = entry.getValue();
+			
+			vystup += String.format("<%s:%s>", key, val);
+		}
+		
 	}
 	
-
+	// 	// placeholder method -> it is planed to move it into WebInventory class - Tottaly useless method
+	public static void onWithdraw(InventoryClickEvent event)
+	{
+		Bukkit.broadcastMessage("Attempt to withdraw from database");
+	}
 }
