@@ -72,6 +72,11 @@ public class WebInventory {
 		}
 		
 	}
+
+	public Inventory getInventory()
+	{
+		return this.inventory;
+	}
 	
 	// Get inventory type
 	public String getInventoryType(String invType)
@@ -201,4 +206,19 @@ public class WebInventory {
 		}
 	}
 
+	public static WebInventory getInstance(String playerName)
+	{
+		if(playerName == "" || playerName == null) return null;
+		
+		synchronized(openInvs)
+		{
+			if(openInvs.containsKey(playerName))
+			{
+				return openInvs.get(playerName);
+			}
+		}
+		
+		// Null if it fail
+		return null;
+	}
 }

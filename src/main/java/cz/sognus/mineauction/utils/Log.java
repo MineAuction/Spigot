@@ -3,6 +3,8 @@ package cz.sognus.mineauction.utils;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
+
 import cz.sognus.mineauction.MineAuction;
 
 /**
@@ -35,5 +37,10 @@ public class Log {
 	public static void warning(String message)
 	{
 		logg.log(Level.WARNING, String.format("%s %s", "[MineAuction]", message));
+	}
+	
+	public static void broadcast(String message)
+	{
+		Bukkit.broadcastMessage(message);
 	}
 }
