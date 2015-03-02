@@ -1,6 +1,5 @@
 package cz.sognus.mineauction;
 
-import java.util.*;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,12 +20,14 @@ public class WebInventoryMeta
 	}
 	
 	
+	// get number of item in stack
 	public int getItemQty()
 	{
 		if(this.item == null) return 0;
 		return this.item.getAmount();		
 	}
 	
+	// get item metadata in json format
 	public String getItemMeta()
 	{
 		if(this.item == null) return "";
@@ -39,6 +40,7 @@ public class WebInventoryMeta
 			
 	}
 	
+	// get item enchantments in json format
 	public String getItemEnchantments()
 	{
 		if(this.item == null) return "";
@@ -61,6 +63,7 @@ public class WebInventoryMeta
 		return json;
 	}
 	
+	// get metadata Hashmap from json
 	@SuppressWarnings("unchecked")
 	public static Map<String, Object> getItemMetaMap(String json)
 	{
@@ -76,6 +79,7 @@ public class WebInventoryMeta
 		
 	}
 	
+	// get enchantments hashmap from json
 	@SuppressWarnings("unchecked")
 	public static Map<Enchantment, Integer> getItemEnchantmentMap(String json)
 	{
@@ -99,6 +103,7 @@ public class WebInventoryMeta
 		return mapEnchant;
 	}
 	
+	// get item id (string)
 	public String getType(ItemStack i)
 	{
 		if(i == null) return "";
@@ -108,6 +113,7 @@ public class WebInventoryMeta
 		return itemTypeName;
 	}
 	
+	// get item durability
 	public short getDurability(ItemStack i)
 	{
 		if(i == null) return -32000;
