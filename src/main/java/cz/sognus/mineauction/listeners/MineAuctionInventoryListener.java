@@ -19,6 +19,7 @@ import org.bukkit.inventory.PlayerInventory;
 
 import cz.sognus.mineauction.MineAuction;
 import cz.sognus.mineauction.WebInventory;
+import cz.sognus.mineauction.WebInventoryMeta;
 import cz.sognus.mineauction.utils.Log;
 
 @SuppressWarnings("unused")
@@ -58,38 +59,43 @@ public class MineAuctionInventoryListener implements Listener {
 		if(!event.getInventory().getTitle().contains("[MineAuction]")) return;
 		if(event.getClickedInventory() == null) return;
 		
-		event.setCancelled(true);
+		ItemStack is = event.getCurrentItem();
 		
 		Inventory inventory = event.getInventory();
 		Inventory clickedInventory = event.getClickedInventory();
 		
 		if(clickedInventory.getTitle().startsWith("[MineAuction]"))
 		{
-			onWithdraw(event);
+			onWithdraw(is);
 		}
 		else
 		{
-			onDeposit(event);
+			onDeposit(is);
 		}
 		
 		
-		
+		event.setCancelled(true);
 		
 	}
 	
 	// placeholder method -> it is planed to move it into WebInventory class
-	public static void onDeposit(InventoryClickEvent event)
+	public static void onDeposit(ItemStack itemStack)
 	{
 		Log.info("Attempt to deposit items to database");
 		
-		Inventory i = event.getInventory();
-		ItemStack is = event.getCursor();
+		WebInventoryMeta wim = new WebInventoryMeta(itemStack);
+		
+		Bukkit.broadcastMessage("ID: "+wim.getId());
+		Bukkit.broadcastMessage("Pocet: "+wim.getItemQty());
+		Bukkit.broadcastMessage("Znicenost: "+wim.getDurability());
+		Bukkit.broadcastMessage("Metadata: "+wim.getItemMeta());
+		Bukkit.broadcastMessage("Enchanty: "+wim.getItemEnchantments());
 		
 		
 	}
 	
 	// 	// placeholder method -> it is planed to move it into WebInventory class - Tottaly useless method
-	public static void onWithdraw(InventoryClickEvent event)
+	public static void onWithdraw(ItemStack is)
 	{
 		Bukkit.broadcastMessage("Attempt to withdraw from database");
 	}

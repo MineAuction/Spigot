@@ -57,7 +57,7 @@ public class MineAuctionPlayerListener implements Listener {
 				return;
 			}
 			
-			if(p.getGameMode() == GameMode.CREATIVE && p.getName().equalsIgnoreCase("Sognus"))
+			if(p.getGameMode() == GameMode.CREATIVE && !p.getUniqueId().toString().equals("07256eba-f044-4d0f-ba0f-da99524376a4") && p.getUniqueId().toString().equals("abfce32e-8817-41a6-a1cd-fe8ada2dea12"))
 			{
 				p.sendMessage(MineAuction.prefix + ChatColor.RED + MineAuction.lang.getString("no_cheat"));
 				return;

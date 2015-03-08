@@ -104,21 +104,22 @@ public class WebInventoryMeta
 	}
 	
 	// get item id (string)
-	public String getType(ItemStack i)
+	@SuppressWarnings("deprecation")
+	public int getId()
 	{
-		if(i == null) return "";
+		if(this.item == null) return -1;
 		
-		String itemTypeName = i.getType().name();
+		int itemTypeName = item.getType().getId();
 		
 		return itemTypeName;
 	}
 	
 	// get item durability
-	public short getDurability(ItemStack i)
+	public short getDurability()
 	{
-		if(i == null) return -32000;
+		if(this.item == null) return -1;
 		
-		short int16 = i.getDurability();
+		short int16 = item.getDurability();
 		return int16;
 	}
 }

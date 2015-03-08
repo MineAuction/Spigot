@@ -2,18 +2,34 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>cz.sognus.mineauction</groupId>
   <artifactId>MineAuction</artifactId>
-  <version>0.0.1-ALPHA</version>
+  <version>ALPHA</version>
   
+  <properties>
+	   <jdk.version>1.7</jdk.version>
+     <gson.version>2.3.1</gson.version>
+	</properties>  
      <build>
       <plugins>
-          <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-compiler-plugin</artifactId>
-              <configuration>
-                  <source>1.7</source>
-                  <target>1.7</target>
-              </configuration>
-          </plugin>
+			   <!-- eclipse -->
+         <plugin>
+				    <groupId>org.apache.maven.plugins</groupId>
+				    <artifactId>maven-eclipse-plugin</artifactId>
+				    <version>2.9</version>
+				    <configuration>
+					     <downloadSources>true</downloadSources>
+					     <downloadJavadocs>false</downloadJavadocs>
+				    </configuration>
+			   </plugin>
+         <!-- JDK compiler -->
+         <plugin>
+				    <groupId>org.apache.maven.plugins</groupId>
+				    <artifactId>maven-compiler-plugin</artifactId>
+				    <version>2.3.2</version>
+				    <configuration>
+					     <source>${jdk.version}</source>
+					     <target>${jdk.version}</target>
+				       </configuration>
+			   </plugin>
       </plugins>
    </build>
    
@@ -28,9 +44,15 @@
        <dependency>
            <groupId>org.spigotmc</groupId>
            <artifactId>spigot-api</artifactId>
-           <version>1.8-R0.1-SNAPSHOT</version>
+           <version>1.8.3-R0.1-SNAPSHOT</version>
            <type>jar</type>
            <scope>provided</scope>
+       </dependency>
+       <dependency>
+	         <groupId>com.google.code.gson</groupId>
+	         <artifactId>gson</artifactId>
+           <version>${gson.version}</version>
+           <scope>compile</scope>
        </dependency>
    </dependencies>
    
