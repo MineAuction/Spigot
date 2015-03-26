@@ -24,7 +24,7 @@ public class WebInventory {
 	
 	
 	protected final Player player;
-	protected final Inventory inventory;
+	public final Inventory inventory;
 	protected final String inventoryTitle;
 	protected boolean canWithdraw;
 	protected boolean canDeposit;
@@ -70,6 +70,75 @@ public class WebInventory {
 		{
 			e.printStackTrace();
 		}
+		
+	}
+	
+	public void itemDeposit(WebInventoryMeta wim) throws Exception
+	{
+		// Unsupported action
+		if(!this.canDeposit)
+		{
+			this.player.sendMessage(MineAuction.prefix + ChatColor.RED + MineAuction.lang.getString("action_invalid"));
+			return;
+		}
+		
+		// Save item to database
+		// exist in database (a - update, b - insert)
+			Connection conn = MineAuction.db.getConnection();
+			PreparedStatement ps = null;
+			
+			// Fix duplicite items records, restack them at database
+			// DatabaseUtils.fixItemStacking()
+			
+			// Same item is in database, update him
+			if(DatabaseUtils.isItemInDatabase(wim, DatabaseUtils.getPlayerId(this.player.getUniqueId())) && wim.getItemStack().getMaxStackSize() > 1)
+			{
+				Bukkit.broadcastMessage("Item->UPDATE->Database");
+				
+				ps = conn.prepareStatement("UPDATE ma_items SET qty = qty + ? WHERE playerID = ? AND itemID= ? AND itemDamage = ? AND itemMeta = ? AND enchantments = ? AND lore = ?");
+				ps.setInt(1, wim.getItemQty());
+				ps.setInt(2, DatabaseUtils.getPlayerId(this.player.getUniqueId()));
+				ps.setInt(3, wim.getId());
+				ps.setShort(4, wim.getDurability());
+				ps.setString(5, wim.getItemMeta());
+				ps.setString(6, wim.getItemEnchantments());
+				ps.setString(7, wim.getLore());
+				
+				Bukkit.broadcastMessage("SQL: "+ps.toString());
+				
+				ps.executeUpdate();
+			}
+			else
+			{
+				Bukkit.broadcastMessage("Item->INSERT->Database");
+				
+				ps = conn.prepareStatement("INSERT INTO `mineauction`.`ma_items` (`playerID`, `itemID`, `itemDamage`, `qty`, `itemMeta`, `enchantments`, `lore`) VALUES (?, ?, ?,?, ?, ?, ?)");
+				ps.setInt(1, DatabaseUtils.getPlayerId(this.player.getUniqueId()));
+				ps.setInt(2, wim.getId());
+				ps.setShort(3, wim.getDurability());
+				ps.setInt(4, wim.getItemQty());
+				ps.setString(5, wim.getItemMeta());
+				ps.setString(6, wim.getItemEnchantments());
+				ps.setString(7, wim.getLore());
+				
+				Bukkit.broadcastMessage("SQL: "+ps.toString());
+				
+				ps.execute();
+			}
+
+	}
+	
+	public void itemWithdraw(WebInventoryMeta wim) throws Exception
+	{
+		// Unsupported action
+		if(!this.canWithdraw)
+		{
+			this.player.sendMessage(MineAuction.prefix + ChatColor.RED + MineAuction.lang.getString("action_invalid"));
+			return;
+		}
+		
+		// Here will be withdraw from database
+		
 		
 	}
 

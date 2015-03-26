@@ -63,7 +63,7 @@ public class MineAuctionPlayerListener implements Listener {
 				return;
 			}
 			
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
+            Bukkit.getScheduler().runTask(this.plugin, new Runnable() {
                 @Override
                 public void run() {
                    WebInventory.onInventoryOpen(p, s.getLine(1)); 

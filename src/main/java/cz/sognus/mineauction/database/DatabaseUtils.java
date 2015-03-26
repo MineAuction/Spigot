@@ -4,8 +4,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.UUID;
+
+import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
+
 import cz.sognus.mineauction.MineAuction;
+import cz.sognus.mineauction.WebInventoryMeta;
 
 /**
  * 
@@ -81,6 +85,48 @@ public class DatabaseUtils {
 	public static String decodeMetadata(ItemStack i)
 	{
 		return i.serialize().toString();
+	}
+	
+	public static boolean isItemInDatabase(WebInventoryMeta wim, int playerID)
+	{	
+		try
+		{
+			Connection conn = MineAuction.db.getConnection();
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			int output = 0;
+			
+			// Create preparedStatement
+			ps = conn.prepareStatement("SELECT COUNT(*) FROM ma_items WHERE playerID = ? AND itemID= ? AND itemDamage = ? AND itemMeta = ? AND enchantments = ? AND lore = ?");
+			ps.setInt(1, playerID);
+			ps.setInt(2, wim.getId());
+			ps.setShort(3, wim.getDurability());
+			ps.setString(4, wim.getItemMeta());
+			ps.setString(5, wim.getItemEnchantments());
+			ps.setString(6, wim.getLore());
+			
+			Bukkit.broadcastMessage("ItemInDatabaseSQL: "+ps.toString());
+			
+			// Get resultSet
+			rs = ps.executeQuery();
+			
+			// Iterate over resultSet
+			while(rs.next())
+			{
+				return rs.getInt(1) > 0 ? true : false;
+			}
+			
+			return false;
+			
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+		return false;
+		
+		
 	}
 	
 	

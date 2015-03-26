@@ -1,11 +1,13 @@
 package cz.sognus.mineauction.listeners;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -13,6 +15,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -42,7 +45,7 @@ public class MineAuctionInventoryListener implements Listener {
 		// Not MineAuction inventory
 		if(inventoryTitle != MineAuction.lang.getString("inventory_title_deposit") && inventoryTitle != MineAuction.lang.getString("inventory_title_withdraw") && inventoryTitle != MineAuction.lang.getString("inventory_title_mailbox")) return;
 		
-        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, new Runnable() {
+        Bukkit.getScheduler().runTask(this.plugin, new Runnable() {
             @Override
             public void run() {
                 WebInventory.onInventoryClose(player);  
@@ -70,7 +73,33 @@ public class MineAuctionInventoryListener implements Listener {
 		}
 		else
 		{
-			onDeposit(is);
+			// Ignore click if inventory slot contains AIR
+			if(is.getType() == Material.AIR) return;
+			
+			Bukkit.broadcastMessage("Item->Database");
+			WebInventory wi = WebInventory.getInstance(event.getWhoClicked().getName());
+			
+			try
+			{
+				wi.itemDeposit(new WebInventoryMeta(is));
+				Player p = Bukkit.getPlayer(event.getWhoClicked().getName());
+				Bukkit.createInventory(p, InventoryType.PLAYER).setItem(event.getSlot(), new ItemStack(Material.AIR));
+				HashMap<Integer, ItemStack> tmp = p.getInventory().removeItem(event.getCurrentItem());
+				
+				// Write an class:
+				// addItemStack - pøidá itemStack (64 qty) daného typu
+				// addItem - pøidá 1 itemstack (1 qty) daného typu
+				// removeItemStack - vymaže itemstack (64 qty) z inventáøe
+				// removeItem - vymaže itemStack (1 qty) z inventáøe
+				
+				
+				String OK = tmp.isEmpty() ? "Y" : "N"; 
+				Bukkit.broadcastMessage(String.format("Deleting item %s for player %s, OK=%s", is.getType().name(), p.getName(),OK));
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
 		}
 		
 		

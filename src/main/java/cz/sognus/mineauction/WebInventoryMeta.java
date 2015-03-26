@@ -1,7 +1,9 @@
 package cz.sognus.mineauction;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.enchantments.Enchantment;
@@ -25,6 +27,27 @@ public class WebInventoryMeta
 	{
 		if(this.item == null) return 0;
 		return this.item.getAmount();		
+	}
+	
+	public String getLore()
+	{
+		if(this.item == null || !this.item.getItemMeta().hasLore()) return "";
+		List<String> loreList = this.item.getItemMeta().getLore();
+		if(loreList == null) return "";
+		Gson gson = new Gson();
+		return gson.toJson(loreList);
+	}
+	 
+	@SuppressWarnings("unchecked")
+	public List<String> getLoreList(String json)
+	{
+		if(json == "" || json == null) return null;
+		Gson gson = new Gson();
+		List<String> loreList = new ArrayList<String>();
+		Type type = new TypeToken<List<String>>(){}.getType();
+		loreList = (List<String>)gson.fromJson(json,type);
+		return loreList;
+		
 	}
 	
 	// get item metadata in json format
@@ -121,5 +144,10 @@ public class WebInventoryMeta
 		
 		short int16 = item.getDurability();
 		return int16;
+	}
+	
+	public ItemStack getItemStack()
+	{
+		return this.item;
 	}
 }
