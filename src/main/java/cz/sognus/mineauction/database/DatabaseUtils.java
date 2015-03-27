@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import cz.sognus.mineauction.MineAuction;
@@ -17,6 +18,26 @@ import cz.sognus.mineauction.WebInventoryMeta;
  */
 public class DatabaseUtils {
 
+	public static void registerPlayer(Player p)
+	{
+		if(playerRegistered(p.getUniqueId())) return;
+		
+		try
+		{
+			Connection con = MineAuction.db.getConnection();
+			PreparedStatement ps = con.prepareStatement("INSERT INTO ma_players (playerName, uuid) VALUES (?, ?)");
+			ps.setString(1, p.getName());
+			ps.setString(2, p.getUniqueId().toString());
+			ps.execute();
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	public static boolean playerRegistered(UUID playerUUID)
 	{
 		boolean registered = false;

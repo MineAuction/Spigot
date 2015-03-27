@@ -8,7 +8,9 @@ import cz.sognus.mineauction.utils.Config;
 import cz.sognus.mineauction.utils.Lang;
 import cz.sognus.mineauction.utils.Log;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -59,6 +61,11 @@ public class MineAuction extends JavaPlugin {
 	public void onDiable()
 	{
 		WebInventory.forceCloseAll();
+		
+		for(Player p : Bukkit.getOnlinePlayers())
+		{
+			p.closeInventory();
+		}
 	}
 	
 	

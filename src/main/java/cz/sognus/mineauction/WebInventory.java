@@ -112,7 +112,7 @@ public class WebInventory {
 			{
 				Bukkit.broadcastMessage("Item->INSERT->Database");
 				
-				ps = conn.prepareStatement("INSERT INTO `mineauction`.`ma_items` (`playerID`, `itemID`, `itemDamage`, `qty`, `itemMeta`, `enchantments`, `lore`) VALUES (?, ?, ?,?, ?, ?, ?)");
+				ps = conn.prepareStatement("INSERT INTO `ma_items` (`playerID`, `itemID`, `itemDamage`, `qty`, `itemMeta`, `enchantments`, `lore`) VALUES (?, ?, ?,?, ?, ?, ?)");
 				ps.setInt(1, DatabaseUtils.getPlayerId(this.player.getUniqueId()));
 				ps.setInt(2, wim.getId());
 				ps.setShort(3, wim.getDurability());

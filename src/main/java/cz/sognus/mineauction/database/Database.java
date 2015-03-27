@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
 import com.google.common.io.CharStreams;
@@ -24,7 +25,7 @@ import cz.sognus.mineauction.utils.Log;
 public class Database
 {
     private final String user;
-    private final String database;
+    public String database;
     private final String password;
     private final String port;
     private final String hostname;

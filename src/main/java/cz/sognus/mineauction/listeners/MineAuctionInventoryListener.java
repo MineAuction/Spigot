@@ -15,12 +15,16 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import cz.sognus.mineauction.MineAuction;
+import cz.sognus.mineauction.WCInventory;
 import cz.sognus.mineauction.WebInventory;
 import cz.sognus.mineauction.WebInventoryMeta;
 import cz.sognus.mineauction.utils.Log;
@@ -54,15 +58,16 @@ public class MineAuctionInventoryListener implements Listener {
 		
 	}
 	
-	
 	// MineAuction inventory click event
-	@EventHandler(priority = EventPriority.NORMAL)
-	public void onInventoryClick(InventoryClickEvent event)
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onInventoryClick(final InventoryClickEvent event)
 	{
 		if(!event.getInventory().getTitle().contains("[MineAuction]")) return;
 		if(event.getClickedInventory() == null) return;
 		
-		ItemStack is = event.getCurrentItem();
+		event.setCancelled(true);
+		
+		ItemStack is = event.getCurrentItem().clone();
 		
 		Inventory inventory = event.getInventory();
 		Inventory clickedInventory = event.getClickedInventory();
@@ -78,23 +83,18 @@ public class MineAuctionInventoryListener implements Listener {
 			
 			Bukkit.broadcastMessage("Item->Database");
 			WebInventory wi = WebInventory.getInstance(event.getWhoClicked().getName());
+			Player p = Bukkit.getPlayer(event.getWhoClicked().getName());
 			
 			try
 			{
-				wi.itemDeposit(new WebInventoryMeta(is));
-				Player p = Bukkit.getPlayer(event.getWhoClicked().getName());
-				Bukkit.createInventory(p, InventoryType.PLAYER).setItem(event.getSlot(), new ItemStack(Material.AIR));
-				HashMap<Integer, ItemStack> tmp = p.getInventory().removeItem(event.getCurrentItem());
+				ItemStack istmp = is.clone();
+				if(event.getClick().isShiftClick()) istmp.setAmount(1); 
+				wi.itemDeposit(new WebInventoryMeta(istmp));
 				
-				// Write an class:
-				// addItemStack - pøidá itemStack (64 qty) daného typu
-				// addItem - pøidá 1 itemstack (1 qty) daného typu
-				// removeItemStack - vymaže itemstack (64 qty) z inventáøe
-				// removeItem - vymaže itemStack (1 qty) z inventáøe
-				
-				
-				String OK = tmp.isEmpty() ? "Y" : "N"; 
-				Bukkit.broadcastMessage(String.format("Deleting item %s for player %s, OK=%s", is.getType().name(), p.getName(),OK));
+				// Vymazání itemu z inventáøe hráèe
+				WCInventory wci = new WCInventory(p);
+				int output = event.getClick().isShiftClick() ? wci.removeItems(is, 1) : wci.removeItems(is, is.getAmount());
+				Bukkit.broadcastMessage("OUT: "+output);
 			}
 			catch(Exception e)
 			{
@@ -102,8 +102,7 @@ public class MineAuctionInventoryListener implements Listener {
 			}
 		}
 		
-		
-		event.setCancelled(true);
+		//event.setCancelled(true);
 		
 	}
 	
