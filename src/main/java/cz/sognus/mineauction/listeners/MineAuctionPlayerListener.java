@@ -13,6 +13,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 
 import cz.sognus.mineauction.MineAuction;
@@ -35,10 +36,9 @@ public class MineAuctionPlayerListener implements Listener {
 	
 	// Player login
 	@EventHandler(priority = EventPriority.NORMAL)
-	public void onPlayerLogin(PlayerLoginEvent event)
+	public void onPlayerJoin(PlayerJoinEvent event)
 	{
-		DatabaseUtils.registerPlayer(event.getPlayer());
-
+		DatabaseUtils.updatePlayerName(event.getPlayer());
 	}
 	
 	

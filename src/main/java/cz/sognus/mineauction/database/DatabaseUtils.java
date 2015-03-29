@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemStack;
 
 import cz.sognus.mineauction.MineAuction;
 import cz.sognus.mineauction.WebInventoryMeta;
+import cz.sognus.mineauction.utils.Log;
 
 /**
  * 
@@ -148,6 +149,23 @@ public class DatabaseUtils {
 		return false;
 		
 		
+	}
+	
+	public static void updatePlayerName(Player p)
+	{
+		int playerID = getPlayerId(p.getUniqueId());
+		try	
+		{
+			Connection conn = MineAuction.db.getConnection();
+			PreparedStatement ps = conn.prepareStatement("UPDATE ma_players SET playerName=? WHERE id=?");
+			ps.setString(1, p.getName());
+			ps.setInt(2, playerID);
+			ps.execute();	
+		}
+		catch(Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	
