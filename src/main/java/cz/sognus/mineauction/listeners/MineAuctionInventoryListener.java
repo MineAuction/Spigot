@@ -125,6 +125,16 @@ public class MineAuctionInventoryListener implements Listener {
 	// 	// placeholder method -> it is planed to move it into WebInventory class - Tottaly useless method
 	public static void onWithdraw(ItemStack is)
 	{
-		Bukkit.broadcastMessage("Attempt to withdraw from database");
+		Bukkit.broadcastMessage("Withdraw debug");
+		
+		if(is.getType() == Material.AIR || is == null) return;
+		
+		WebInventoryMeta wim = new WebInventoryMeta(is);
+		
+		Bukkit.broadcastMessage("ID: "+wim.getId());
+		Bukkit.broadcastMessage("Pocet: "+wim.getItemQty());
+		Bukkit.broadcastMessage("Znicenost: "+wim.getDurability());
+		Bukkit.broadcastMessage("Metadata: "+wim.getItemMeta());
+		Bukkit.broadcastMessage("Enchanty: "+wim.getItemEnchantments());
 	}
 }

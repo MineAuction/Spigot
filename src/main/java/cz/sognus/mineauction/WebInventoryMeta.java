@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
@@ -55,7 +57,7 @@ public class WebInventoryMeta
 	{
 		if(this.item == null) return "";
 		Map<String, Object> mapMeta = this.item.getItemMeta().serialize();
-		
+
 		Gson gson = new Gson();
 		String json = gson.toJson(mapMeta);
 		
@@ -92,9 +94,14 @@ public class WebInventoryMeta
 	{
 		if(json == "" || json == null) return null;
 		
+		Bukkit.broadcastMessage("Json before: "+json);
+		json = json.replaceAll("\"enchants[^,}]+}","\"fix\":\"true\"");
+		Bukkit.broadcastMessage("Json after: " + json);
+		
+		
 		Gson gson = new Gson();
 		Map<String, Object> mapMeta = new HashMap<String, Object>();
-		Type type = new TypeToken<Map<String, String>>(){}.getType();
+		Type type = new TypeToken<Map<String, String>>(){}.getType();		
 		mapMeta = (Map<String, Object>)gson.fromJson(json,type);
 		
 		return mapMeta;
@@ -117,8 +124,10 @@ public class WebInventoryMeta
 		
 		for(Map.Entry<String, Object> entry : mapData.entrySet())
 		{
+			Bukkit.broadcastMessage("EnchMapDebg: "+entry.getKey()+"=>"+entry.getValue());
+			
 			Enchantment e = Enchantment.getByName(entry.getKey());
-			Integer i = (Integer) entry.getValue();
+			Integer i = (Integer) Integer.parseInt((String) entry.getValue());
 			
 			mapEnchant.put(e, i);
 		}

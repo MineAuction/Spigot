@@ -3,17 +3,25 @@ package cz.sognus.mineauction;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.configuration.serialization.DelegateDeserialization;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import cz.sognus.mineauction.database.DatabaseUtils;
 import cz.sognus.mineauction.utils.Log;
@@ -41,36 +49,79 @@ public class WebInventory {
 		this.inventory = Bukkit.createInventory(null, 54, inventoryTitle);
 		
 		// Load it
-		//this.loadInventory();
-		this.inventory.setItem(0, new ItemStack(Material.DIAMOND, 64));
+		this.loadInventory();
+		//this.inventory.setItem(0, new ItemStack(Material.DIAMOND, 64));
 		
 		// open it
 		this.player.openInventory(this.inventory);
 	}
 	
 	// Load items to inventory
+	@SuppressWarnings("deprecation")
 	public void loadInventory()
 	{
-		Connection conn = MineAuction.db.getConnection();
-		PreparedStatement st = null;
-		ResultSet rs = null;
-		
 		try
 		{
-			st = conn.prepareStatement("SELECT * FROM ma_items WHERE playerId = ? LIMIT ?");
-			st.setInt(1, DatabaseUtils.getPlayerId(this.player.getUniqueId()));
-			st.setInt(2, inventory.getSize());
+			Connection conn = MineAuction.db.getConnection();
+			PreparedStatement ps = conn.prepareStatement("SELECT * FROM ma_items WHERE playerID=? ORDER BY qty ASC LIMIT 54");
 			
-			// done loading
-			// solve item meta
-			// set lore about item qty
+			// Prepare statement
+			int playerID = DatabaseUtils.getPlayerId(this.player.getUniqueId());
+			ps.setInt(1, playerID);
+			
+			Bukkit.broadcastMessage(ps.toString());
+			
+			// Result 
+			ResultSet rs = ps.executeQuery();
+			int i = 0;
+			
+			// Reset inventory
+			this.inventory.clear();
+			
+			
+			// Work with result
+			while(rs.next())
+			{
+				if(rs.getInt("qty") < 1) continue;
+				
+				// Get Item information
+				int itemID = rs.getInt("itemID");
+				short itemDamage = rs.getShort("itemDamage");
+				int qty = rs.getInt("qty");
+				
+				Map<String, Object> itemMeta = WebInventoryMeta.getItemMetaMap(rs.getString("itemMeta"));
+				Map<Enchantment, Integer> itemEnch = WebInventoryMeta.getItemEnchantmentMap(rs.getString("enchantments"));
+				
+				// Create ItemStack and properties		
+				ItemStack dbItem = new ItemStack(Material.getMaterial(itemID));
+				int visualQty = qty > dbItem.getMaxStackSize() ? dbItem.getMaxStackSize() : qty;
+				String visualLore = String.format("%s: %d", MineAuction.lang.getString("auction_item_quantity"), qty);
+				
+				// Item Meta
+				ItemMeta im = (ItemMeta) ConfigurationSerialization.deserializeObject(itemMeta, ConfigurationSerialization.getClassByAlias("ItemMeta"));
+				
+				// qty lore
+				List<String> tempList = new ArrayList<String>();
+				tempList.add(visualLore);
+				im.setLore(tempList);
+				
+				// Update itemstack
+				dbItem.setItemMeta(im);
+				dbItem.setAmount(visualQty);
+				dbItem.setDurability(itemDamage);
+				dbItem.addEnchantments(itemEnch);
+				
+				this.inventory.setItem(i, dbItem);
+				i++;	
+			}
 			
 		}
 		catch(Exception e)
 		{
 			e.printStackTrace();
+			
 		}
-		
+	
 	}
 	
 	public void itemDeposit(WebInventoryMeta wim) throws Exception
@@ -125,6 +176,10 @@ public class WebInventory {
 				
 				ps.execute();
 			}
+			
+			// Update WebInventory
+			this.loadInventory();
+			this.player.updateInventory();
 
 	}
 	
