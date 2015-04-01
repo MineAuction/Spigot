@@ -1,0 +1,32 @@
+
+################################################################
+#
+# MineAuction English language file	
+#									
+################################################################
+
+no_permission: "Na toto nemas prava!"
+no_cheat: "Cheaty jsou na tomto serveru zakazany."
+
+auction_using: "Inventar aukce je jiz otevren."
+auction_loading: "Oteviram inventar..."
+auction_saving: "Vas inventar byl ulozen.." 
+
+auction_item_quantity: "Mnozstvi"
+
+sign_create: "Aukcni bod byl uspesne vytvoren."
+sign_create_deposit: "Vkladni aukcni bod byl uspesne vytvoren."
+sign_create_withdraw: "Vyberni aukcni bod byl uspesne vytvoren."
+sign_removed: "Aukcni bod byl uspesne zrusen."
+sign_invalid: "Neplatna cedule! Pro vice informaci zkontroluj oficialni web pluginu."
+
+action_invalid: "Tato akce nemohla byt dokoncena."
+
+inventory_title_deposit: "[MineAuction] Vklad"
+inventory_title_withdraw: "[MineAuction] Vyber"
+inventory_title_mailbox: "[MineAuction] MailBox"
+inventory_title_invalid: "Neplatny typ aukcniho inventare."
+
+account_created: "Ucet na MineAuction byl uspesne vytvoren."
+account_passwordchange: "Heslo k tvemu MineAuction uctu bylo uspesne zmeneno."
+account_register: "Abys mohl pouzit tuto ceduli, musis mit ucet na MineAuction!"
