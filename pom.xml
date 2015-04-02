@@ -16,6 +16,17 @@
 		<gson.version>2.3.1</gson.version>
 	</properties>
 	<build>
+		<resources>
+			<!-- Maven variables to plugin.yml -->
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>plugin.yml</include>
+				</includes>
+			</resource>
+		</resources>
+
 		<plugins>
 			<!-- Build number -->
 			<plugin>
@@ -30,7 +41,7 @@
 					</execution>
 				</executions>
 				<configuration>
-				<getRevisionOnlyOnce>getRevisionOnlyOnce>true</getRevisionOnlyOnce>
+					<getRevisionOnlyOnce>getRevisionOnlyOnce>true</getRevisionOnlyOnce>
 					<doCheck>false</doCheck>
 					<doUpdate>false</doUpdate>
 					<format>{0,number}</format>

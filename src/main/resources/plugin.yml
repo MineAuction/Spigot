@@ -1,5 +1,11 @@
 name: MineAuction
 main: cz.sognus.mineauction.MineAuction
-version: ALPHA
+version: ${version.release}.${version.major}.${buildNumber}
 author: Sognus
 description: --nope--
+
+commands:
+  ma:
+    description: Main command for this plugin
+    aliases: [mineauction, auction, aukce]
+    usage: /<command> help
