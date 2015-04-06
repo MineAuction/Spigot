@@ -29,6 +29,11 @@ import cz.sognus.mineauction.WebInventory;
 import cz.sognus.mineauction.WebInventoryMeta;
 import cz.sognus.mineauction.utils.Log;
 
+/**
+* 
+* @author Sognus
+* 
+*/
 @SuppressWarnings("unused")
 public class MineAuctionInventoryListener implements Listener {
 	
@@ -122,7 +127,7 @@ public class MineAuctionInventoryListener implements Listener {
 		
 	}
 	
-	// 	// placeholder method -> it is planed to move it into WebInventory class - Tottaly useless method
+	// 	// placeholder method -> it is planed to move it into WebInventory class - Totally useless method
 	public static void onWithdraw(ItemStack is)
 	{
 		Bukkit.broadcastMessage("Withdraw debug");
