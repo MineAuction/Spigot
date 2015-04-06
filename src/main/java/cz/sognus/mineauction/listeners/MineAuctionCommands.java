@@ -1,10 +1,5 @@
 package cz.sognus.mineauction.listeners;
 
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

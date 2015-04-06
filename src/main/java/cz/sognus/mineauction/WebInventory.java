@@ -82,6 +82,8 @@ public class WebInventory {
 			// Work with result
 			while(rs.next())
 			{
+				try
+				{
 				if(rs.getInt("qty") < 1) continue;
 				
 				// Get Item information
@@ -112,7 +114,15 @@ public class WebInventory {
 				dbItem.addEnchantments(itemEnch);
 				
 				this.inventory.setItem(i, dbItem);
-				i++;	
+				i++;
+				}
+				catch(Exception e)
+				{
+					int itemID = rs.getInt("itemID");
+					ItemStack is = new ItemStack(Material.getMaterial(itemID));
+						
+					this.player.sendMessage(MineAuction.plugin.prefix + ChatColor.RED + String.format("Skipping item %s, because it has some errors.", is.getType().name()));
+				}
 			}
 			
 		}

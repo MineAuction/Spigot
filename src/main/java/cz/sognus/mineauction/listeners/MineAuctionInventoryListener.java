@@ -91,7 +91,7 @@ public class MineAuctionInventoryListener implements Listener {
 				if(event.getClick().isShiftClick()) istmp.setAmount(1); 
 				wi.itemDeposit(new WebInventoryMeta(istmp));
 				
-				// Vymazání itemu z inventáøe hráèe
+				// Vymazani itemy z inventare
 				WCInventory wci = new WCInventory(p);
 				int output = event.getClick().isShiftClick() ? wci.removeItems(is, 1) : wci.removeItems(is, is.getAmount());
 				Bukkit.broadcastMessage("OUT: "+output);

@@ -5,13 +5,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 public class WebInventoryMeta
@@ -94,16 +96,15 @@ public class WebInventoryMeta
 	{
 		if(json == "" || json == null) return null;
 		
-		Bukkit.broadcastMessage("Json before: "+json);
-		json = json.replaceAll("\"enchants[^,}]+}","\"fix\":\"true\"");
-		Bukkit.broadcastMessage("Json after: " + json);
-		
+		//Gson gson = new Gson();
+		//Map<String, Object> mapMeta = new HashMap<String, Object>();
+		//Type type = new TypeToken<Map<String, Object>>(){}.getType();		
+		//mapMeta = (Map<String, Object>)gson.fromJson(json,type);
 		
 		Gson gson = new Gson();
 		Map<String, Object> mapMeta = new HashMap<String, Object>();
-		Type type = new TypeToken<Map<String, String>>(){}.getType();		
-		mapMeta = (Map<String, Object>)gson.fromJson(json,type);
-		
+		mapMeta = (Map<String, Object>) gson.fromJson(json, mapMeta.getClass());
+	
 		return mapMeta;
 		
 		
