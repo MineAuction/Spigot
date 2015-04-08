@@ -103,8 +103,7 @@ public class WebInventoryMeta
 		// Temporary hashmap fix attemp
 		if(mapMeta.containsKey("repair-cost"));
 		{
-			double d = Double.parseDouble((String) mapMeta.get("repair-cost"));
-			Integer integer = new Integer((int)d);
+			Integer integer = Integer.valueOf(String.valueOf(mapMeta.get("repair-cost")));
 			mapMeta.replace("repair-cost", integer);
 		}
 	
