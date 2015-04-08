@@ -106,7 +106,7 @@ public class WebInventoryMeta
 			Bukkit.broadcastMessage((String) mapMeta.get("repair-cost"));
 	        Double d = new Double(Double.valueOf((String)mapMeta.get("repair-cost")));
 	        Integer i = d.intValue();
-			mapMeta.replace("repair-cost", integer);
+			mapMeta.replace("repair-cost", i);
 		}
 	
 		return mapMeta;
