@@ -109,7 +109,8 @@ public class WebInventoryMeta
 			s = s.substring(0, s.indexOf("."));
 			Integer i = Integer.valueOf(s);
 			
-			mapMeta.replace("repair-cost", i);
+			mapMeta.remove("repair-cost");
+			mapMeta.put("repair-cost", i);
 		}
 	
 		return mapMeta;
