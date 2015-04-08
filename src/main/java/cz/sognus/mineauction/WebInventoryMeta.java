@@ -101,9 +101,9 @@ public class WebInventoryMeta
 		mapMeta = (Map<String, Object>) gson.fromJson(json, mapMeta.getClass());
 		
 		// Temporary hashmap fix attemp
-		if(mapMeta.containsKey("repair-cost"))
+		if(mapMeta.containsKey("repair-cost"));
 		{
-			String value = (String) mapMeta.get("repair-cost");
+			String value = "" + mapMeta.get("repair-cost");
 			Integer integer = Integer.parseInt(value);
 			mapMeta.replace("repair-cost", integer);
 		}
