@@ -16,6 +16,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
+import cz.sognus.mineauction.utils.HashMapFixer;
+
 public class WebInventoryMeta
 {
 	private final ItemStack item;
@@ -100,19 +102,10 @@ public class WebInventoryMeta
 		Map<String, Object> mapMeta = new HashMap<String, Object>();
 		mapMeta = (Map<String, Object>) gson.fromJson(json, mapMeta.getClass());
 		
-		// Temporary hashmap fix attemp
-		if(mapMeta.containsKey("repair-cost"));
-		{
-			Bukkit.broadcastMessage(String.valueOf(mapMeta.get("repair-cost")));
-			Object o = mapMeta.get("repair-cost");
-			String s = String.valueOf(o);
-			s = s.substring(0, s.indexOf("."));
-			Integer i = Integer.valueOf(s);
-			
-			mapMeta.remove("repair-cost");
-			mapMeta.put("repair-cost", i);
-		}
-	
+		HashMapFixer hmf = new HashMapFixer(mapMeta);
+		mapMeta = hmf.fix();
+
+		
 		return mapMeta;
 		
 		
