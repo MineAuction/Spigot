@@ -92,18 +92,21 @@ public class WebInventoryMeta
 	
 	// get metadata Hashmap from json
 	@SuppressWarnings("unchecked")
-	public static Map<String, Object> getItemMetaMap(String json)
+	public static Map<String, Object> getItemMetaMap(String json) throws Exception
 	{
 		if(json == "" || json == null) return null;
-		
-		//Gson gson = new Gson();
-		//Map<String, Object> mapMeta = new HashMap<String, Object>();
-		//Type type = new TypeToken<Map<String, Object>>(){}.getType();		
-		//mapMeta = (Map<String, Object>)gson.fromJson(json,type);
 		
 		Gson gson = new Gson();
 		Map<String, Object> mapMeta = new HashMap<String, Object>();
 		mapMeta = (Map<String, Object>) gson.fromJson(json, mapMeta.getClass());
+		
+		// Temporary hashmap fix attemp
+		if(mapMeta.containsKey("repair-cost"))
+		{
+			String value = (String) mapMeta.get("repair-cost");
+			Integer integer = Integer.parseInt(value);
+			mapMeta.replace("repair-cost", integer);
+		}
 	
 		return mapMeta;
 		
