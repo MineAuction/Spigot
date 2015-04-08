@@ -122,6 +122,8 @@ public class WebInventory {
 					ItemStack is = new ItemStack(Material.getMaterial(itemID));
 						
 					this.player.sendMessage(MineAuction.plugin.prefix + ChatColor.RED + String.format("Skipping item %s, because it has some errors.", is.getType().name()));
+					
+					e.printStackTrace();
 				}
 			}
 			

@@ -1,6 +1,6 @@
 name: MineAuction
 main: cz.sognus.mineauction.MineAuction
-version: ${version.release}.${version.major}.${buildNumber}
+version: ${version.release}.${version.major}.${version.minor}-B${buildNumber}
 author: Sognus
 description: --nope--
 
