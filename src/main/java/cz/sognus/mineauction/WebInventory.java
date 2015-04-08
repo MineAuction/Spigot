@@ -24,6 +24,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import cz.sognus.mineauction.database.DatabaseUtils;
+import cz.sognus.mineauction.utils.HashMapFixer;
 import cz.sognus.mineauction.utils.Log;
 
 public class WebInventory {
@@ -100,6 +101,8 @@ public class WebInventory {
 				String visualLore = String.format("%s: %d", MineAuction.lang.getString("auction_item_quantity"), qty);
 				
 				// Item Meta
+				HashMapFixer hmf = new HashMapFixer(itemMeta);
+				itemMeta = hmf.fix();
 				ItemMeta im = (ItemMeta) ConfigurationSerialization.deserializeObject(itemMeta, ConfigurationSerialization.getClassByAlias("ItemMeta"));
 				
 				// qty lore

@@ -17,6 +17,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import cz.sognus.mineauction.utils.HashMapFixer;
+import cz.sognus.mineauction.utils.Log;
 
 public class WebInventoryMeta
 {
@@ -105,7 +106,6 @@ public class WebInventoryMeta
 		HashMapFixer hmf = new HashMapFixer(mapMeta);
 		mapMeta = hmf.fix();
 
-		
 		return mapMeta;
 		
 		
