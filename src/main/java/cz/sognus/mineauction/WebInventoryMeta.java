@@ -92,7 +92,7 @@ public class WebInventoryMeta
 	
 	// get metadata Hashmap from json
 	@SuppressWarnings("unchecked")
-	public static Map<String, Object> getItemMetaMap(String json) throws Exception
+	public static Map<String, Object> getItemMetaMap(String json)
 	{
 		if(json == "" || json == null) return null;
 		
@@ -104,8 +104,11 @@ public class WebInventoryMeta
 		if(mapMeta.containsKey("repair-cost"));
 		{
 			Bukkit.broadcastMessage((String) mapMeta.get("repair-cost"));
-	        Double d = new Double(Double.valueOf((String.valueOf(mapMeta.get("repair-cost")))));
-	        Integer i = d.intValue();
+			Object o = mapMeta.get("repair-cost");
+			String s = String.valueOf(o);
+			s = s.substring(0, s.indexOf("."));
+			Integer i = Integer.valueOf(s);
+			
 			mapMeta.replace("repair-cost", i);
 		}
 	
