@@ -3,6 +3,8 @@ package cz.sognus.mineauction.utils;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
+
 public class HashMapFixer {
 	
 	private Map<String, Object> map;
@@ -21,7 +23,7 @@ public class HashMapFixer {
 			
 			// Fix repair-cost
 			if(key == "repair-cost")
-			{
+			{	
 				Object o = value;
 				String s = String.valueOf(o);
 				s = s.substring(0, s.indexOf("."));
@@ -29,6 +31,8 @@ public class HashMapFixer {
 				
 				map.remove(key, value);
 				map.put(key, i);
+				
+				Log.debug("Fixed key: "+key+" with value "+s);
 				
 			}
 		}
