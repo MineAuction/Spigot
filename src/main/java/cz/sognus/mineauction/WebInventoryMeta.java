@@ -103,6 +103,7 @@ public class WebInventoryMeta
 		// Temporary hashmap fix attemp
 		if(mapMeta.containsKey("repair-cost"));
 		{
+			Bukkit.broadcastMessage((String) mapMeta.get("repair-cost"));
 			Integer integer = Integer.valueOf(String.valueOf(mapMeta.get("repair-cost")));
 			mapMeta.replace("repair-cost", integer);
 		}
