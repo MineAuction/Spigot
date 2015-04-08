@@ -104,7 +104,7 @@ public class WebInventoryMeta
 		if(mapMeta.containsKey("repair-cost"));
 		{
 			Bukkit.broadcastMessage((String) mapMeta.get("repair-cost"));
-	        Double d = new Double(Double.valueOf((String)mapMeta.get("repair-cost")));
+	        Double d = new Double(Double.valueOf((String.valueOf(mapMeta.get("repair-cost")))));
 	        Integer i = d.intValue();
 			mapMeta.replace("repair-cost", i);
 		}
