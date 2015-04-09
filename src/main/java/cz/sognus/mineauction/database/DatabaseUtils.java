@@ -11,7 +11,6 @@ import org.bukkit.inventory.ItemStack;
 
 import cz.sognus.mineauction.MineAuction;
 import cz.sognus.mineauction.WebInventoryMeta;
-import cz.sognus.mineauction.utils.Log;
 
 /**
  * 
@@ -116,6 +115,7 @@ public class DatabaseUtils {
 			Connection conn = MineAuction.db.getConnection();
 			PreparedStatement ps = null;
 			ResultSet rs = null;
+			@SuppressWarnings("unused")
 			int output = 0;
 			
 			// Create preparedStatement

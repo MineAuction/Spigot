@@ -11,6 +11,7 @@ import cz.sognus.mineauction.MineAuction;
 
 public class MineAuctionCommands implements CommandExecutor {
 
+	@SuppressWarnings("unused")
 	private MineAuction plugin;
 	
 	public MineAuctionCommands(MineAuction plugin)

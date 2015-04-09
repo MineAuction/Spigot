@@ -11,13 +11,9 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonNull;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import cz.sognus.mineauction.utils.HashMapFixer;
-import cz.sognus.mineauction.utils.Log;
 
 public class WebInventoryMeta
 {
@@ -95,9 +91,11 @@ public class WebInventoryMeta
 	
 	// get metadata Hashmap from json
 	@SuppressWarnings("unchecked")
-	public static Map<String, Object> getItemMetaMap(String json)
+	public static Map<String, Object> getItemMetaMap(String Ijson)
 	{
-		if(json == "" || json == null) return null;
+		if(Ijson == "" || Ijson == null) return null;
+		
+		String json = Ijson.replaceAll("\\.\\d+", "");
 		
 		Gson gson = new Gson();
 		Map<String, Object> mapMeta = new HashMap<String, Object>();
@@ -115,9 +113,11 @@ public class WebInventoryMeta
 	
 	// get enchantments hashmap from json
 	@SuppressWarnings("unchecked")
-	public static Map<Enchantment, Integer> getItemEnchantmentMap(String json)
+	public static Map<Enchantment, Integer> getItemEnchantmentMap(String Ijson)
 	{
-		if(json == "" || json == null) return null;
+		if(Ijson == "" || Ijson == null) return null;
+		
+		String json = Ijson.replaceAll("\\.\\d+", "");
 		
 		Gson gson = new Gson();
 		Map<String, Object> mapData = new HashMap<String, Object>();
