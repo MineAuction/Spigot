@@ -104,7 +104,9 @@ public class WebInventoryMeta
 		mapMeta = (Map<String, Object>) gson.fromJson(json, mapMeta.getClass());
 		
 		HashMapFixer hmf = new HashMapFixer(mapMeta);
+		hmf.printInputMap();
 		mapMeta = hmf.fix();
+		hmf.printOutputMap();
 
 		return mapMeta;
 		
