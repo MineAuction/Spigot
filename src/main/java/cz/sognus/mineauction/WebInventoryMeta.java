@@ -11,6 +11,8 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.LongSerializationPolicy;
 import com.google.gson.reflect.TypeToken;
 
 import cz.sognus.mineauction.utils.HashMapFixer;
@@ -83,7 +85,7 @@ public class WebInventoryMeta
 			
 		}
 		
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().disableInnerClassSerialization().setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
 		String json = gson.toJson(mapData);
 		
 		return json;
@@ -97,7 +99,7 @@ public class WebInventoryMeta
 		
 		String json = Ijson.replaceAll("\\.\\d+", "");
 		
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
 		Map<String, Object> mapMeta = new HashMap<String, Object>();
 		mapMeta = (Map<String, Object>) gson.fromJson(json, mapMeta.getClass());
 		
@@ -119,7 +121,7 @@ public class WebInventoryMeta
 		
 		String json = Ijson.replaceAll("\\.\\d+", "");
 		
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
 		Map<String, Object> mapData = new HashMap<String, Object>();
 		Type type = new TypeToken<Map<String, String>>(){}.getType();
 		mapData = (Map<String, Object>)gson.fromJson(json,type);
