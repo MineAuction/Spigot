@@ -65,7 +65,7 @@ public class WebInventoryMeta
 		if(this.item == null) return "";
 		Map<String, Object> mapMeta = this.item.getItemMeta().serialize();
 
-		Gson gson = new Gson();
+		Gson gson = new GsonBuilder().setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
 		String json = gson.toJson(mapMeta);
 		
 		return json;
