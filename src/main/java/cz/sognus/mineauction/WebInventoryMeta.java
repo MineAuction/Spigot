@@ -12,6 +12,10 @@ import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.LongSerializationPolicy;
 import com.google.gson.reflect.TypeToken;
 
@@ -99,7 +103,19 @@ public class WebInventoryMeta
 		
 		String json = Ijson.replaceAll("\\.\\d+", "");
 		
-		Gson gson = new GsonBuilder().setLongSerializationPolicy(LongSerializationPolicy.STRING).enableComplexMapKeySerialization().disableInnerClassSerialization().create();
+		// Gson setup:
+		 Gson gson = new GsonBuilder().
+			        registerTypeAdapter(Double.class,  new JsonSerializer<Double>() {   
+
+			    @Override
+			    public JsonElement serialize(Double src, Type typeOfSrc, JsonSerializationContext context) {
+			        if(src == src.longValue())
+			            return new JsonPrimitive(src.longValue());          
+			        return new JsonPrimitive(src);
+			    }
+			 }).create();
+		 
+		// Json to HashMap convert
 		Map<String, Object> mapMeta = new HashMap<String, Object>();
 		mapMeta = (Map<String, Object>) gson.fromJson(json, mapMeta.getClass());
 		
