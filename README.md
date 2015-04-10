@@ -1,5 +1,5 @@
 # MineAuction
-===========
+-------------
 ## Info
 Java part of MineAuction plugin, which is mostly based on old WebAuctionPlus plugin. However our plugin provides more configuration ways at both java and web side.
 
