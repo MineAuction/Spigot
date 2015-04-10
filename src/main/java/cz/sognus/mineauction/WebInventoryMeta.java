@@ -99,7 +99,7 @@ public class WebInventoryMeta
 		
 		String json = Ijson.replaceAll("\\.\\d+", "");
 		
-		Gson gson = new GsonBuilder().setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
+		Gson gson = new GsonBuilder().setLongSerializationPolicy(LongSerializationPolicy.STRING).enableComplexMapKeySerialization().disableInnerClassSerialization().create();
 		Map<String, Object> mapMeta = new HashMap<String, Object>();
 		mapMeta = (Map<String, Object>) gson.fromJson(json, mapMeta.getClass());
 		
