@@ -14,10 +14,12 @@ import org.bukkit.inventory.ItemStack;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.LongSerializationPolicy;
 import com.google.gson.reflect.TypeToken;
-
-import cz.sognus.mineauction.utils.HashMapFixer;
 
 public class WebInventoryMeta
 {
@@ -63,8 +65,22 @@ public class WebInventoryMeta
 		if(this.item == null) return "";
 		Map<String, Object> mapMeta = this.item.getItemMeta().serialize();
 
-		Gson gson = new GsonBuilder().disableInnerClassSerialization().setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
-		String json = gson.toJson(mapMeta);
+		//setup gson
+		// Gson setup
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Double.class,  new JsonSerializer<Double>() {
+
+            public JsonElement serialize(Double src, Type typeOfSrc,
+                        JsonSerializationContext context) {
+                    Integer value = (int)Math.round(src);
+                    return new JsonPrimitive(value);
+                }
+            });
+
+        Gson gson = gsonBuilder.setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
+		
+		// HashMap to json
+        String json = gson.toJson(mapMeta);
 		
 		return json;
 			
@@ -87,7 +103,7 @@ public class WebInventoryMeta
 			
 		}
 		
-		Gson gson = new GsonBuilder().disableInnerClassSerialization().setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
+		Gson gson = new GsonBuilder().setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
 		String json = gson.toJson(mapData);
 		
 		return json;
@@ -105,16 +121,21 @@ public class WebInventoryMeta
         if(m.find()) Ijson.replaceFirst("\\\"repair-cost\\\":[0-9]*\\.[0-9]", m.group());
 		
 		// Gson setup
-		Gson gson = new Gson();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Double.class,  new JsonSerializer<Double>() {
+
+            public JsonElement serialize(Double src, Type typeOfSrc,
+                        JsonSerializationContext context) {
+                    Integer value = (int)Math.round(src);
+                    return new JsonPrimitive(value);
+                }
+            });
+
+        Gson gson = gsonBuilder.setLongSerializationPolicy(LongSerializationPolicy.STRING).create();
 		 
 		// Json to HashMap convert
 		Map<String, Object> mapMeta = new HashMap<String, Object>();
 		mapMeta = (Map<String, Object>) gson.fromJson(Ijson, mapMeta.getClass());
-		
-		HashMapFixer hmf = new HashMapFixer(mapMeta);
-		hmf.printInputMap();
-		mapMeta = hmf.fix();
-		hmf.printOutputMap();
 
 		return mapMeta;
 		
