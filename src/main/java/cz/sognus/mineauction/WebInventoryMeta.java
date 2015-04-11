@@ -115,6 +115,9 @@ public class WebInventoryMeta {
 	@SuppressWarnings("unchecked")
 	public static Map<String, Object> getItemMetaMap(String Ijson){
 		if(Ijson == "" || Ijson == null) return null;
+		
+		// Setup gson
+		Gson gson = new Gson();;
 
         // Json to HashMap convert
         Map<String, Object> mapMeta = new HashMap<String, Object>();
