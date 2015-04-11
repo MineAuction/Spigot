@@ -117,23 +117,24 @@ public class WebInventoryMeta {
 		if(Ijson == "" || Ijson == null) return null;
 		
 		// Setup gson
-		Gson gson = new Gson();;
+		Gson gson = new Gson();
 
         // Json to HashMap convert
         Map<String, Object> mapMeta = new HashMap<String, Object>();
         mapMeta = (Map<String, Object>) gson.fromJson(Ijson, mapMeta.getClass());
         
         // fix hash map by Sekiphp
-        String property = "repair-cost";
+        List<String> intProperties = new ArrayList<String>();
+        intProperties.add("repair-cost");
+        intProperties.add("generation");
+        
 		for (Entry<String, Object> entry : mapMeta.entrySet()){
-			if(entry.getKey().equalsIgnoreCase(property)){
+			if(intProperties.contains(entry.getKey())){
 				String fixed = String.valueOf(entry.getValue()).replaceAll("\\.\\d+", "");
 				
-				mapMeta.remove(entry.getKey());
-				mapMeta.put(property, new Integer(fixed));
-				break;
+				mapMeta.put(entry.getKey(), new Integer(fixed));
 			}
-		}  
+		}
 		
 		// check the hashMap
 		for (Entry<String, Object> entry : mapMeta.entrySet()){
