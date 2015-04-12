@@ -127,6 +127,9 @@ public class WebInventoryMeta {
         List<String> intProperties = new ArrayList<String>();
         intProperties.add("repair-cost");
         intProperties.add("generation");
+        intProperties.add("red");
+        intProperties.add("green");
+        intProperties.add("blue");
         
 		for (Entry<String, Object> entry : mapMeta.entrySet()){
 			if(intProperties.contains(entry.getKey())){
