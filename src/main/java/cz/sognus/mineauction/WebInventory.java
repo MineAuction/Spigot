@@ -100,8 +100,17 @@ public class WebInventory {
 				ItemMeta im = (ItemMeta) ConfigurationSerialization.deserializeObject(itemMeta, ConfigurationSerialization.getClassByAlias("ItemMeta"));
 				
 				// qty lore
-				List<String> tempList = dbItem.getItemMeta().getLore();
-				tempList.add(visualLore);
+				List<String> tempList = new ArrayList<String>();
+				
+				if(dbItem.getItemMeta().hasLore())
+				{
+					tempList = dbItem.getItemMeta().getLore();
+					tempList.add(visualLore);	
+				}
+				else
+				{	
+					tempList.add(visualLore);	
+				}
 				im.setLore(tempList);
 				
 				// Update itemstack
