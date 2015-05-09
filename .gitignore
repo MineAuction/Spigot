@@ -11,6 +11,8 @@ dependency-reduced-pom.xml
 *.vi
 *~
 
+# pom.xml
+
 # OS or Editor folders
 .DS_Store
 .cache

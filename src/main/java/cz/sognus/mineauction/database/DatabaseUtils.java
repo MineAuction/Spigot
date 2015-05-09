@@ -18,158 +18,131 @@ import cz.sognus.mineauction.WebInventoryMeta;
  */
 public class DatabaseUtils {
 
-	public static void registerPlayer(Player p)
-	{
-		if(playerRegistered(p.getUniqueId())) return;
-		
-		try
-		{
+	public static void registerPlayer(Player p) {
+		if (playerRegistered(p.getUniqueId()))
+			return;
+
+		try {
 			Connection con = MineAuction.db.getConnection();
-			PreparedStatement ps = con.prepareStatement("INSERT INTO ma_players (playerName, uuid) VALUES (?, ?)");
+			PreparedStatement ps = con
+					.prepareStatement("INSERT INTO ma_players (playerName, uuid) VALUES (?, ?)");
 			ps.setString(1, p.getName());
 			ps.setString(2, p.getUniqueId().toString());
 			ps.execute();
-		}
-		catch(Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 	}
-	
-	
-	public static boolean playerRegistered(UUID playerUUID)
-	{
+
+	public static boolean playerRegistered(UUID playerUUID) {
 		boolean registered = false;
-		
-		try
-		{
+
+		try {
 			Connection con = MineAuction.db.getConnection();
-			PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) FROM ma_players WHERE uuid = ?");
+			PreparedStatement ps = con
+					.prepareStatement("SELECT COUNT(*) FROM ma_players WHERE uuid = ?");
 			ps.setString(1, playerUUID.toString());
 			ResultSet rs = ps.executeQuery();
-			
-			while(rs.next())
-			{
+
+			while (rs.next()) {
 				registered = rs.getInt(1) == 1 ? true : false;
 				return registered;
 			}
-			
+
 			ps.close();
 			rs.close();
-			
-			
-		}
-		catch(Exception e)
-		{
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return registered;
-		
+
 	}
-	
-	public static int getPlayerId(UUID playerUUID)
-	{
+
+	public static int getPlayerId(UUID playerUUID) {
 		Connection conn = MineAuction.db.getConnection();
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		int output = 0;
-		
-		try
-		{
-			st = conn.prepareStatement("SELECT * FROM ma_players WHERE uuid = ?  LIMIT 1");
+
+		try {
+			st = conn
+					.prepareStatement("SELECT * FROM ma_players WHERE uuid = ?  LIMIT 1");
 			st.setString(1, playerUUID.toString());
-			
+
 			rs = st.executeQuery();
-			
-			while(rs.next())
-			{
+
+			while (rs.next()) {
 				output = rs.getInt("id");
 			}
-			
+
 			rs.close();
 			st.close();
-			
+
 			return output;
-			
-		}
-		catch(Exception e)
-		{
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return output;
-		
+
 	}
-	
-	public static String decodeMetadata(ItemStack i)
-	{
+
+	public static String decodeMetadata(ItemStack i) {
 		return i.serialize().toString();
 	}
-	
-	public static boolean isItemInDatabase(WebInventoryMeta wim, int playerID)
-	{	
-		try
-		{
+
+	public static boolean isItemInDatabase(WebInventoryMeta wim, int playerID) {
+		try {
 			Connection conn = MineAuction.db.getConnection();
 			PreparedStatement ps = null;
 			ResultSet rs = null;
 			@SuppressWarnings("unused")
 			int output = 0;
-			
+
 			// Create preparedStatement
-			ps = conn.prepareStatement("SELECT COUNT(*) FROM ma_items WHERE playerID = ? AND itemID= ? AND itemDamage = ? AND itemMeta = ? AND enchantments = ? AND lore = ?");
+			ps = conn
+					.prepareStatement("SELECT COUNT(*) FROM ma_items WHERE playerID = ? AND itemID= ? AND itemDamage = ? AND enchantments = ? AND lore = ?");
 			ps.setInt(1, playerID);
 			ps.setInt(2, wim.getId());
 			ps.setShort(3, wim.getDurability());
-			ps.setString(4, wim.getItemMeta());
-			ps.setString(5, wim.getItemEnchantments());
-			ps.setString(6, wim.getLore());
-			
-			Bukkit.broadcastMessage("ItemInDatabaseSQL: "+ps.toString());
-			
+			// ps.setString(4, wim.getItemMeta());
+			ps.setString(4, wim.getItemEnchantments());
+			ps.setString(5, wim.getLore());
+
 			// Get resultSet
 			rs = ps.executeQuery();
-			
+
 			// Iterate over resultSet
-			while(rs.next())
-			{
+			while (rs.next()) {
 				return rs.getInt(1) > 0 ? true : false;
 			}
-			
+
 			return false;
-			
-		}
-		catch(Exception e)
-		{
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		return false;
-		
-		
+
 	}
-	
-	public static void updatePlayerName(Player p)
-	{
+
+	public static void updatePlayerName(Player p) {
 		int playerID = getPlayerId(p.getUniqueId());
-		try	
-		{
+		try {
 			Connection conn = MineAuction.db.getConnection();
-			PreparedStatement ps = conn.prepareStatement("UPDATE ma_players SET playerName=? WHERE id=?");
+			PreparedStatement ps = conn
+					.prepareStatement("UPDATE ma_players SET playerName=? WHERE id=?");
 			ps.setString(1, p.getName());
 			ps.setInt(2, playerID);
-			ps.execute();	
-		}
-		catch(Exception e)
-		{
+			ps.execute();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
-	
 
 }
-
-

@@ -5,20 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 import com.google.gson.LongSerializationPolicy;
 import com.google.gson.reflect.TypeToken;
 
@@ -59,35 +51,6 @@ public class WebInventoryMeta {
 
 	}
 
-	// get item metadata in json format
-	public String getItemMeta() {
-		if (this.item == null)
-			return "";
-		Map<String, Object> mapMeta = this.item.getItemMeta().serialize();
-
-		// setup gson
-		// Gson setup
-		GsonBuilder gsonBuilder = new GsonBuilder();
-		gsonBuilder.registerTypeAdapter(Double.class,
-				new JsonSerializer<Double>() {
-
-					public JsonElement serialize(Double src, Type typeOfSrc,
-							JsonSerializationContext context) {
-						Integer value = (int) Math.round(src);
-						return new JsonPrimitive(value);
-					}
-				});
-
-		Gson gson = gsonBuilder.setLongSerializationPolicy(
-				LongSerializationPolicy.STRING).create();
-
-		// HashMap to json
-		String json = gson.toJson(mapMeta);
-
-		return json;
-
-	}
-
 	// get item enchantments in json format
 	public String getItemEnchantments() {
 		if (this.item == null)
@@ -111,43 +74,6 @@ public class WebInventoryMeta {
 		return json;
 	}
 
-	// get metadata Hashmap from json
-	@SuppressWarnings("unchecked")
-	public static Map<String, Object> getItemMetaMap(String Ijson){
-		if(Ijson == "" || Ijson == null) return null;
-		
-		// Setup gson
-		Gson gson = new Gson();
-
-        // Json to HashMap convert
-        Map<String, Object> mapMeta = new HashMap<String, Object>();
-        mapMeta = (Map<String, Object>) gson.fromJson(Ijson, mapMeta.getClass());
-        
-        // fix hash map by Sekiphp
-        List<String> intProperties = new ArrayList<String>();
-        intProperties.add("repair-cost");
-        intProperties.add("generation");
-        intProperties.add("red");
-        intProperties.add("green");
-        intProperties.add("blue");
-        
-		for (Entry<String, Object> entry : mapMeta.entrySet()){
-			if(intProperties.contains(entry.getKey())){
-				String fixed = String.valueOf(entry.getValue()).replaceAll("\\.\\d+", "");
-				
-				mapMeta.put(entry.getKey(), new Integer(fixed));
-			}
-		}
-		
-		// check the hashMap
-		for (Entry<String, Object> entry : mapMeta.entrySet()){
-			Bukkit.broadcastMessage("key: " + entry.getKey() + ", value: " + entry.getValue() + ", type: " + entry.getValue().getClass().getName());
-		}
-        
-
-        return mapMeta;		
-	}
-
 	// get enchantments hashmap from json
 	@SuppressWarnings("unchecked")
 	public static Map<Enchantment, Integer> getItemEnchantmentMap(String Ijson) {
@@ -166,8 +92,6 @@ public class WebInventoryMeta {
 		Map<Enchantment, Integer> mapEnchant = new HashMap<Enchantment, Integer>();
 
 		for (Map.Entry<String, Object> entry : mapData.entrySet()) {
-			Bukkit.broadcastMessage("EnchMapDebg: " + entry.getKey() + "=>"
-					+ entry.getValue());
 
 			Enchantment e = Enchantment.getByName(entry.getKey());
 			Integer i = (Integer) Integer.parseInt((String) entry.getValue());
@@ -201,4 +125,26 @@ public class WebInventoryMeta {
 	public ItemStack getItemStack() {
 		return this.item;
 	}
+
+	// METADATA VERSION 2 HERE
+	public String getItemMeta() {
+		YamlConfiguration iconf = new YamlConfiguration();
+		iconf.set("data", this.item);
+		String items = iconf.saveToString();
+		return items;
+	}
+
+	public static ItemStack getItemStack(String yaml) {
+		ItemStack is = null;
+		YamlConfiguration iconf = new YamlConfiguration();
+
+		try {
+			iconf.loadFromString(yaml);
+			is = iconf.getItemStack("data");
+		} catch (Exception e) {
+		}
+		return is;
+	}
+
+	// END OF METADATA V2
 }

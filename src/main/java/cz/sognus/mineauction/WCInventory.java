@@ -7,10 +7,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 /**
-* 
-* @author SiDzej (_CJ_)
-* 
-*/
+ * 
+ * @author SiDzej (_CJ_)
+ * 
+ */
 
 public class WCInventory {
 	private Player p;
@@ -36,10 +36,11 @@ public class WCInventory {
 		}
 		return false;
 	}
-	
-	public boolean hasItemStack(ItemStack item){
+
+	public boolean hasItemStack(ItemStack item) {
 		for (ItemStack is : i.getContents()) {
-			if(is == null) continue;
+			if (is == null)
+				continue;
 			if (is.isSimilar(item))
 				return true;
 		}
