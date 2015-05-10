@@ -140,6 +140,11 @@ public class WebInventory {
 		}
 	}
 
+	public void refreshInventory() {
+		this.loadInventory();
+		this.player.updateInventory();
+	}
+
 	public void itemDeposit(WebInventoryMeta wim) throws Exception {
 		// Unsupported action
 		if (!this.canDeposit) {
@@ -160,7 +165,6 @@ public class WebInventory {
 		if (DatabaseUtils.isItemInDatabase(wim,
 				DatabaseUtils.getPlayerId(this.player.getUniqueId()))
 				&& wim.getItemStack().getMaxStackSize() > 1) {
-			Bukkit.broadcastMessage("Item->UPDATE->Database");
 
 			ps = conn
 					.prepareStatement("UPDATE ma_items SET qty = qty + ? WHERE playerID = ? AND itemID= ? AND itemDamage = ? AND itemMeta = ? AND enchantments = ? AND lore = ?");
@@ -174,7 +178,6 @@ public class WebInventory {
 
 			ps.executeUpdate();
 		} else {
-			Bukkit.broadcastMessage("Item->INSERT->Database");
 
 			ps = conn
 					.prepareStatement("INSERT INTO `ma_items` (`playerID`, `itemID`, `itemDamage`, `qty`, `itemMeta`, `enchantments`, `lore`) VALUES (?, ?, ?,?, ?, ?, ?)");

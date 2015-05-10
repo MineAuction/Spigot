@@ -1,0 +1,13 @@
+a.3.0: (Build 44)
+[ADDED]: Item withdraw is now fully functional.
+
+[IMPROVED] Project was cleaned, chat broadcasts and other debugs were deleted.
+
+
+a.2.0: (Build 43)
+[FIXED] Fixed an issue that caused wrong lore display.
+[FiXED] Fixed an issue which blocked Banner loading from database.
+[FIXED] Fixed an issue which blocked FireWorks loading from database. 
+
+[CHANGE] Way of saving and loading items was completely rewritten.
+[CHANGE] Source code formatting style was changed.

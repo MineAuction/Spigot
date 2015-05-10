@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -91,10 +90,6 @@ public class DatabaseUtils {
 
 	}
 
-	public static String decodeMetadata(ItemStack i) {
-		return i.serialize().toString();
-	}
-
 	public static boolean isItemInDatabase(WebInventoryMeta wim, int playerID) {
 		try {
 			Connection conn = MineAuction.db.getConnection();
@@ -143,6 +138,137 @@ public class DatabaseUtils {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	@SuppressWarnings({ "deprecation", "unused" })
+	public static boolean areItemsInDatabase(Player pl, ItemStack is, int qty) {
+		if (is == null)
+			return false;
+		int playerID = getPlayerId(pl.getUniqueId());
+		WebInventoryMeta wim = new WebInventoryMeta(is);
+		ResultSet rs = null;
+		try {
+			Connection conn = MineAuction.db.getConnection();
+			PreparedStatement ps = conn
+					.prepareStatement("SELECT COUNT(*) FROM ma_items WHERE id=? AND itemDamage=? AND enchantments = ? AND qty >=?");
+			ps.setInt(1, is.getType().getId());
+			ps.setShort(2, is.getDurability());
+			ps.setString(3, wim.getItemEnchantments());
+			ps.setInt(4, qty);
+
+			rs = ps.executeQuery();
+
+			// Iterate over resultSet
+			while (rs.next()) {
+				return rs.getInt(1) > 0 ? true : false;
+			}
+
+			return false;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return false;
+
+	}
+
+	@SuppressWarnings("deprecation")
+	public static ResultSet getItemFromDatabase(ItemStack is) {
+		if (is == null)
+			throw new NullPointerException();
+		WebInventoryMeta wim = new WebInventoryMeta(is);
+		ResultSet rs = null;
+		try {
+			Connection conn = MineAuction.db.getConnection();
+			PreparedStatement ps = conn
+					.prepareStatement("SELECT * FROM ma_items WHERE itemID=? AND itemDamage=? AND enchantments = ? ORDER BY qty DESC LIMIT 1");
+			ps.setInt(1, is.getType().getId());
+			ps.setShort(2, is.getDurability());
+			ps.setString(3, wim.getItemEnchantments());
+
+			rs = ps.executeQuery();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return rs;
+	}
+
+	@SuppressWarnings("deprecation")
+	public static int getItemCountDatabase(ItemStack is) {
+		if (is == null)
+			throw new NullPointerException();
+		WebInventoryMeta wim = new WebInventoryMeta(is);
+		ResultSet rs = null;
+		try {
+			Connection conn = MineAuction.db.getConnection();
+			PreparedStatement ps = conn
+					.prepareStatement("SELECT * FROM ma_items WHERE itemID=? AND itemDamage=? AND enchantments = ? ORDER BY qty DESC LIMIT 1");
+			ps.setInt(1, is.getType().getId());
+			ps.setShort(2, is.getDurability());
+			ps.setString(3, wim.getItemEnchantments());
+
+			rs = ps.executeQuery();
+
+			while (rs.next()) {
+				return rs.getInt("qty");
+			}
+			return 0;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
+	public static boolean updateItemInDatabase(Player p, ItemStack is,
+			int qtyDelete) {
+		if (is == null || p == null)
+			throw new NullPointerException();
+		WebInventoryMeta wim = new WebInventoryMeta(is);
+		try {
+			int dbQty = getItemCountDatabase(is);
+
+			// Database vars
+			Connection conn = MineAuction.db.getConnection();
+			PreparedStatement ps = null;
+
+			// Not enough items in database
+			if (qtyDelete > dbQty) {
+				return false;
+			}
+
+			// Delete row
+			if (qtyDelete == dbQty) {
+				ps = conn
+						.prepareStatement("DELETE FROM ma_items WHERE itemID=? AND itemDamage=? AND enchantments = ?");
+				ps.setInt(1, wim.getId());
+				ps.setShort(2, wim.getDurability());
+				ps.setString(3, wim.getItemEnchantments());
+
+				ps.execute();
+
+				// Return true if success
+				return true;
+			} else {
+				// UPDATE ROW
+				ps = conn
+						.prepareStatement("UPDATE ma_items SET qty = qty - ? WHERE itemID=? AND itemDamage=? AND enchantments = ?");
+				ps.setInt(1, qtyDelete);
+				ps.setInt(2, wim.getId());
+				ps.setShort(3, wim.getDurability());
+				ps.setString(4, wim.getItemEnchantments());
+
+				ps.execute();
+
+				// Return true if success
+				return true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 
 }

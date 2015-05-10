@@ -13,6 +13,8 @@ dependency-reduced-pom.xml
 
 # pom.xml
 
+# buildnumber
+
 # OS or Editor folders
 .DS_Store
 .cache

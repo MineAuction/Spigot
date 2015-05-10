@@ -6,6 +6,8 @@
 
 no_permission: "You don't have permission to do that."
 no_cheat: "Hey, don't cheat!"
+no_item_update: "An error occured when withdrawing item from database"
+not_enough_space: "You can't withdraw that, your inventory is full!"
 
 auction_using: "Auction inventory already opened!"
 auction_loading: "Opening inventory..."

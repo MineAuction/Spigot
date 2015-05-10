@@ -1,5 +1,6 @@
 package cz.sognus.mineauction.listeners;
 
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -8,6 +9,7 @@ import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,7 +30,9 @@ import cz.sognus.mineauction.MineAuction;
 import cz.sognus.mineauction.WCInventory;
 import cz.sognus.mineauction.WebInventory;
 import cz.sognus.mineauction.WebInventoryMeta;
+import cz.sognus.mineauction.database.DatabaseUtils;
 import cz.sognus.mineauction.utils.Log;
+import cz.sognus.mineauction.utils.PlayerUtils;
 
 /**
  * 
@@ -69,6 +73,7 @@ public class MineAuctionInventoryListener implements Listener {
 	}
 
 	// MineAuction inventory click event
+	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onInventoryClick(final InventoryClickEvent event) {
 		if (!event.getInventory().getTitle().contains("[MineAuction]"))
@@ -84,13 +89,68 @@ public class MineAuctionInventoryListener implements Listener {
 		Inventory clickedInventory = event.getClickedInventory();
 
 		if (clickedInventory.getTitle().startsWith("[MineAuction]")) {
-			onWithdraw(is);
+			// ITEM WITHDRAW
+			// Ignore click if inventory slot contains AIR
+			if (is.getType() == Material.AIR)
+				return;
+			
+			WebInventory wip = WebInventory.getInstance(event.getWhoClicked()
+					.getName());
+			Player pl = Bukkit.getPlayer(event.getWhoClicked().getName());
+			int qty = event.getClick().isShiftClick() ? 1 : is.getAmount();
+
+			// Get item stack
+			try {
+				ResultSet rs = DatabaseUtils.getItemFromDatabase(is);
+
+				while (rs.next()) {
+					// Get item Data
+					int itemID = rs.getInt("itemID");
+					short itemDamage = rs.getShort("itemDamage");
+					int qnty = rs.getInt("qty");
+					String itemData = rs.getString("itemMeta");
+					Map<Enchantment, Integer> itemEnch = WebInventoryMeta
+							.getItemEnchantmentMap(rs.getString("enchantments"));
+
+					ItemStack stack = null;
+
+					if (itemData != null && itemData != "") {
+						// Yaml metadata
+						is = WebInventoryMeta.getItemStack(itemData);
+					} else {
+						// No yaml metadata
+						is = new ItemStack(Material.getMaterial(itemID), qnty,
+								itemDamage);
+					}
+
+					// Overwrite values
+					is.setDurability(itemDamage);
+					is.addEnchantments(itemEnch);
+
+					// Update database
+					boolean success = DatabaseUtils.updateItemInDatabase(pl,
+							is, qty);
+
+					// Update player inventory
+					if (!success) {
+						pl.sendMessage(MineAuction.prefix + ChatColor.RED + MineAuction.lang.getString("no_item_update"));
+						return;
+					}
+					WCInventory wci = new WCInventory(pl);
+					wci.addItems(is, qty);
+					WebInventory.getInstance(pl.getName()).refreshInventory();
+				}
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
 		} else {
+			// ITEM DEPOSIT
 			// Ignore click if inventory slot contains AIR
 			if (is.getType() == Material.AIR)
 				return;
 
-			Bukkit.broadcastMessage("Item->Database");
 			WebInventory wi = WebInventory.getInstance(event.getWhoClicked()
 					.getName());
 			Player p = Bukkit.getPlayer(event.getWhoClicked().getName());
@@ -112,14 +172,5 @@ public class MineAuctionInventoryListener implements Listener {
 
 		// event.setCancelled(true);
 
-	}
-
-	// // placeholder method -> it is planed to move it into WebInventory class
-	// - Totally useless method
-	public static void onWithdraw(ItemStack is) {
-		Bukkit.broadcastMessage("Withdraw debug");
-
-		if (is.getType() == Material.AIR || is == null)
-			return;
 	}
 }
