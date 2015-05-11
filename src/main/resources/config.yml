@@ -4,6 +4,7 @@
 #
 ################################################################
 
+
 debug: true
 lang: "en"
 
@@ -14,3 +15,44 @@ mysql:
   database: "mineauction"
   user: "minecraft"
   password: "1234"
+
+
+# NEW CONFIG
+plugin:
+  #
+  # General plugin configuration
+  #
+  general:
+    # Run plugin in debug mode
+    debug: true
+    # Set language file to load
+    lang: "en"
+    # Setup database variables
+    mysql:
+      host: "localhost"
+      port: "3306"
+      database: "mineauction"
+      user: "minecraft"
+      password: "1234"
+  # Plugin security configuration
+  security:
+    # Experimental way of protecting signs
+    # REQUIRES: logging.signs
+    bedrock: false
+    # Security logging configuration
+    logging:
+      actions:
+      # Log every single item deposit to database
+      deposit: false
+      # Log every single item withdraw from database
+      withdraw: false
+      # Log creating and destroying auction points
+      signs: false
+  #
+  # Configure stuff that may be reason of lower performance
+  #
+  performance:
+    # Refresh virtual inventory every after deposit or withdraw
+    refresh: true
+    # Configure tasks
+    tasks: false  
