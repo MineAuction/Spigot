@@ -146,12 +146,12 @@ public class WebInventory {
 		this.player.updateInventory();
 	}
 
-	public void itemDeposit(WebInventoryMeta wim) throws Exception {
+	public boolean itemDeposit(WebInventoryMeta wim) throws Exception {
 		// Unsupported action
 		if (!this.canDeposit) {
 			this.player.sendMessage(MineAuction.prefix + ChatColor.RED
 					+ MineAuction.lang.getString("action_invalid_deposit"));
-			return;
+			return false;
 		}
 
 		// Save item to database
@@ -196,16 +196,18 @@ public class WebInventory {
 		// Refresh inventory if it is set in config
 		if (MineAuction.config.getBool("plugin.performance.refresh"))
 			this.refreshInventory();
+		
+		return true;
 
 	}
 
 	@SuppressWarnings({ "deprecation", "unused" })
-	public void itemWithdraw(final InventoryClickEvent event) throws Exception {
+	public boolean itemWithdraw(final InventoryClickEvent event) throws Exception {
 		// Unsupported action
 		if (!this.canWithdraw) {
 			this.player.sendMessage(MineAuction.prefix + ChatColor.RED
 					+ MineAuction.lang.getString("action_invalid_withdraw"));
-			return;
+			return false;
 		}
 
 		ItemStack is = event.getCurrentItem().clone();
@@ -250,18 +252,21 @@ public class WebInventory {
 				if (!success) {
 					pl.sendMessage(MineAuction.prefix + ChatColor.RED
 							+ MineAuction.lang.getString("no_item_update"));
-					return;
+					return false;
 				}
 				WCInventory wci = new WCInventory(pl);
 				wci.addItems(is, qty);
 
 				if (MineAuction.config.getBool("plugin.performance.refresh"))
 					this.refreshInventory();
+				
+				return true;
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return false;
 
 	}
 

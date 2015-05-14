@@ -102,44 +102,6 @@ public class MineAuctionInventoryListener implements Listener {
 				e.printStackTrace();
 			}
 			
-			/*
-			 * 
-			 * WebInventory wip = WebInventory.getInstance(event.getWhoClicked()
-			 * .getName()); Player pl =
-			 * Bukkit.getPlayer(event.getWhoClicked().getName()); int qty =
-			 * event.getClick().isShiftClick() ? 1 : is.getAmount();
-			 * 
-			 * // Get item stack try { ResultSet rs =
-			 * DatabaseUtils.getItemFromDatabase(is);
-			 * 
-			 * while (rs.next()) { // Get item Data int itemID =
-			 * rs.getInt("itemID"); short itemDamage =
-			 * rs.getShort("itemDamage"); int qnty = rs.getInt("qty"); String
-			 * itemData = rs.getString("itemMeta"); Map<Enchantment, Integer>
-			 * itemEnch = WebInventoryMeta
-			 * .getItemEnchantmentMap(rs.getString("enchantments"));
-			 * 
-			 * ItemStack stack = null;
-			 * 
-			 * if (itemData != null && itemData != "") { // Yaml metadata is =
-			 * WebInventoryMeta.getItemStack(itemData); } else { // No yaml
-			 * metadata is = new ItemStack(Material.getMaterial(itemID), qnty,
-			 * itemDamage); }
-			 * 
-			 * // Overwrite values is.setDurability(itemDamage);
-			 * is.addEnchantments(itemEnch);
-			 * 
-			 * // Update database boolean success =
-			 * DatabaseUtils.updateItemInDatabase(pl, is, qty);
-			 * 
-			 * // Update player inventory if (!success) {
-			 * pl.sendMessage(MineAuction.prefix + ChatColor.RED +
-			 * MineAuction.lang.getString("no_item_update")); return; }
-			 * WCInventory wci = new WCInventory(pl); wci.addItems(is, qty);
-			 * WebInventory.getInstance(pl.getName()).refreshInventory(); }
-			 * 
-			 * } catch (Exception e) { e.printStackTrace(); }
-			 */
 		} else {
 			// ITEM DEPOSIT
 			// Ignore click if inventory slot contains AIR
@@ -154,7 +116,9 @@ public class MineAuctionInventoryListener implements Listener {
 				ItemStack istmp = is.clone();
 				if (event.getClick().isShiftClick())
 					istmp.setAmount(1);
-				wi.itemDeposit(new WebInventoryMeta(istmp));
+				boolean depositOK = wi.itemDeposit(new WebInventoryMeta(istmp));
+				
+				if(!depositOK) return;
 
 				// Vymazani itemy z inventare
 				WCInventory wci = new WCInventory(p);

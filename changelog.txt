@@ -1,6 +1,13 @@
+a.3.2 (Build 47)
+[FIXED] Fixed an item deleting when user attempting to deposit item to auction point that doesn't support it.
+
+[CHANGE] Minor change to database in order to implement new configuration style
+
 a.3.1 (Build 46)
 [FIXED] Fixed an issue where users could withdraw their items when auction point type didn't support that
 [FIXED] Fixed an issue which may cause an errors when plugin was loading language package.
+
+[ADDED] Configuration option refresh (performance) was implemented
 
 [IMPROVED] Some minor default language change
 [IMPROVED] Minor code refactor.
@@ -13,7 +20,7 @@ a.3.0: (Build 44)
 
 a.2.0: (Build 43)
 [FIXED] Fixed an issue that caused wrong lore display.
-[FiXED] Fixed an issue which blocked Banner loading from database.
+[FIXED] Fixed an issue which blocked Banner loading from database.
 [FIXED] Fixed an issue which blocked FireWorks loading from database. 
 
 [CHANGE] Way of saving and loading items was completely rewritten.

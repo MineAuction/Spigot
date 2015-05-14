@@ -33,11 +33,11 @@ public class Database {
 
 	public Database(Plugin plugin) {
 		this.plugin = plugin;
-		this.hostname = MineAuction.config.getString("mysql.host");
-		this.port = MineAuction.config.getString("mysql.port");
-		this.database = MineAuction.config.getString("mysql.database");
-		this.user = MineAuction.config.getString("mysql.user");
-		this.password = MineAuction.config.getString("mysql.password");
+		this.hostname = MineAuction.config.getString("plugin.general.mysql.host");
+		this.port = MineAuction.config.getString("plugin.general.mysql.port");
+		this.database = MineAuction.config.getString("plugin.general.mysql.database");
+		this.user = MineAuction.config.getString("plugin.general.mysql.user");
+		this.password = MineAuction.config.getString("plugin.general.mysql.password");
 		this.connection = null;
 	}
 

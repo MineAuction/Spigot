@@ -13,7 +13,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.release>a</version.release>
 		<version.major>3</version.major>
-		<version.minor>1</version.minor>
+		<version.minor>2</version.minor>
 		<jdk.version>1.7</jdk.version>
 		<gson.version>2.3.1</gson.version>
 	</properties>
