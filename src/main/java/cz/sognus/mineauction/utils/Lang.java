@@ -22,6 +22,8 @@ import cz.sognus.mineauction.MineAuction;
  *
  * @author Sognus
  * 
+ * 
+ * TODO: Opravit nemožnost editovat soubor pokud je zapnut server
  */
 public class Lang {
 
@@ -46,6 +48,7 @@ public class Lang {
 			InputStream is = new FileInputStream(file);
 			Map<String, Object> result = (Map<String, Object>) yaml.load(is);
 			messages.putAll(result);
+			is.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -118,6 +121,9 @@ public class Lang {
 			FileWriter writer = new FileWriter(file);
 			data.put(key, "<<Required content not found>>");
 			yaml.dump(data, writer);
+			
+			writer.close();
+			is.close();
 
 			return "<<Required content not found>>";
 		} catch (Exception e) {
@@ -127,6 +133,16 @@ public class Lang {
 		Log.warning("An error occurred while trying to get language content");
 		return "<<An error occurred while trying to get language content>>";
 
+	}
+	
+	public static void deleteLangFiles()
+	{
+		File dir = new File(MineAuction.plugin.getDataFolder() + "/lang/");
+		for(File file: dir.listFiles()) 
+		{
+			file.delete();
+		}
+		
 	}
 
 }

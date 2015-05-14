@@ -11,7 +11,17 @@ not_enough_space: "You can't withdraw that, your inventory is full!"
 
 auction_using: "Auction inventory already opened!"
 auction_loading: "Opening inventory..."
-auction_saving: "Inventory closed and saved." 
+auction_saving: "Inventory closed and saved."
+
+command_version: "Current version is:"
+command_reload_success: "Plugin has been reloaded.."
+command_reload_permission: "You don't have permission to reload plugin!"
+command_lang_reload_success: "Language files has been reloaded!"
+command_lang_reload_permission: "You don't have permission to reload language settings!"
+command_lang_reset_success: "Language files has been updated.."
+command_lang_reset_permission: "You don't have permission to reset language files!"
+command_config_reload_success: "Config has been reloaded.."
+command_config_reload_permission: "You don't have permission to reload config!" 
 
 auction_item_quantity: "Quantity"
 

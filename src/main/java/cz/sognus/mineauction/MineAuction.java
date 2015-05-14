@@ -69,6 +69,11 @@ public class MineAuction extends JavaPlugin {
 		onDisable();
 		onEnable();
 	}
+	
+	public void reloadLang()
+	{
+		MineAuction.lang = new Lang(this);
+	}
 
 	public void onDiable() {
 		WebInventory.forceCloseAll();

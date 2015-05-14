@@ -95,6 +95,14 @@ public class MineAuctionInventoryListener implements Listener {
 
 			WebInventory wi = WebInventory.getInstance(event.getWhoClicked()
 					.getName());
+			
+			// Fix handler for invClick issued after reload
+			if(wi == null)
+			{
+				event.getWhoClicked().closeInventory();
+				return;
+			}
+			
 			try {
 				wi.itemWithdraw(event);
 			} catch (Exception e) {
