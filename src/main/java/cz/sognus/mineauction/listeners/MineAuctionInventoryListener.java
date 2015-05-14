@@ -73,7 +73,6 @@ public class MineAuctionInventoryListener implements Listener {
 	}
 
 	// MineAuction inventory click event
-	@SuppressWarnings("deprecation")
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onInventoryClick(final InventoryClickEvent event) {
 		if (!event.getInventory().getTitle().contains("[MineAuction]"))
@@ -93,58 +92,54 @@ public class MineAuctionInventoryListener implements Listener {
 			// Ignore click if inventory slot contains AIR
 			if (is.getType() == Material.AIR)
 				return;
-			
-			WebInventory wip = WebInventory.getInstance(event.getWhoClicked()
+
+			WebInventory wi = WebInventory.getInstance(event.getWhoClicked()
 					.getName());
-			Player pl = Bukkit.getPlayer(event.getWhoClicked().getName());
-			int qty = event.getClick().isShiftClick() ? 1 : is.getAmount();
-
-			// Get item stack
 			try {
-				ResultSet rs = DatabaseUtils.getItemFromDatabase(is);
-
-				while (rs.next()) {
-					// Get item Data
-					int itemID = rs.getInt("itemID");
-					short itemDamage = rs.getShort("itemDamage");
-					int qnty = rs.getInt("qty");
-					String itemData = rs.getString("itemMeta");
-					Map<Enchantment, Integer> itemEnch = WebInventoryMeta
-							.getItemEnchantmentMap(rs.getString("enchantments"));
-
-					ItemStack stack = null;
-
-					if (itemData != null && itemData != "") {
-						// Yaml metadata
-						is = WebInventoryMeta.getItemStack(itemData);
-					} else {
-						// No yaml metadata
-						is = new ItemStack(Material.getMaterial(itemID), qnty,
-								itemDamage);
-					}
-
-					// Overwrite values
-					is.setDurability(itemDamage);
-					is.addEnchantments(itemEnch);
-
-					// Update database
-					boolean success = DatabaseUtils.updateItemInDatabase(pl,
-							is, qty);
-
-					// Update player inventory
-					if (!success) {
-						pl.sendMessage(MineAuction.prefix + ChatColor.RED + MineAuction.lang.getString("no_item_update"));
-						return;
-					}
-					WCInventory wci = new WCInventory(pl);
-					wci.addItems(is, qty);
-					WebInventory.getInstance(pl.getName()).refreshInventory();
-				}
-
+				wi.itemWithdraw(event);
 			} catch (Exception e) {
+
 				e.printStackTrace();
 			}
-
+			
+			/*
+			 * 
+			 * WebInventory wip = WebInventory.getInstance(event.getWhoClicked()
+			 * .getName()); Player pl =
+			 * Bukkit.getPlayer(event.getWhoClicked().getName()); int qty =
+			 * event.getClick().isShiftClick() ? 1 : is.getAmount();
+			 * 
+			 * // Get item stack try { ResultSet rs =
+			 * DatabaseUtils.getItemFromDatabase(is);
+			 * 
+			 * while (rs.next()) { // Get item Data int itemID =
+			 * rs.getInt("itemID"); short itemDamage =
+			 * rs.getShort("itemDamage"); int qnty = rs.getInt("qty"); String
+			 * itemData = rs.getString("itemMeta"); Map<Enchantment, Integer>
+			 * itemEnch = WebInventoryMeta
+			 * .getItemEnchantmentMap(rs.getString("enchantments"));
+			 * 
+			 * ItemStack stack = null;
+			 * 
+			 * if (itemData != null && itemData != "") { // Yaml metadata is =
+			 * WebInventoryMeta.getItemStack(itemData); } else { // No yaml
+			 * metadata is = new ItemStack(Material.getMaterial(itemID), qnty,
+			 * itemDamage); }
+			 * 
+			 * // Overwrite values is.setDurability(itemDamage);
+			 * is.addEnchantments(itemEnch);
+			 * 
+			 * // Update database boolean success =
+			 * DatabaseUtils.updateItemInDatabase(pl, is, qty);
+			 * 
+			 * // Update player inventory if (!success) {
+			 * pl.sendMessage(MineAuction.prefix + ChatColor.RED +
+			 * MineAuction.lang.getString("no_item_update")); return; }
+			 * WCInventory wci = new WCInventory(pl); wci.addItems(is, qty);
+			 * WebInventory.getInstance(pl.getName()).refreshInventory(); }
+			 * 
+			 * } catch (Exception e) { e.printStackTrace(); }
+			 */
 		} else {
 			// ITEM DEPOSIT
 			// Ignore click if inventory slot contains AIR

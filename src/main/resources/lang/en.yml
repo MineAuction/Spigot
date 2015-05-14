@@ -22,6 +22,8 @@ sign_removed: "Auction sign removed."
 sign_invalid: "Invalid sign! Check official site for more information."
 
 action_invalid: "This action cannot be performed."
+action_invalid_deposit: "This auction point does not support item deposit!"
+action_invalid_withdraw: "This auction point does not support item withdraw! "
 
 inventory_title_deposit: "[MineAuction] Deposit"
 inventory_title_withdraw: "[MineAuction] Withdraw"

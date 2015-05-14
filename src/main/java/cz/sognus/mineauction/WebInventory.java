@@ -15,6 +15,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -149,7 +150,7 @@ public class WebInventory {
 		// Unsupported action
 		if (!this.canDeposit) {
 			this.player.sendMessage(MineAuction.prefix + ChatColor.RED
-					+ MineAuction.lang.getString("action_invalid"));
+					+ MineAuction.lang.getString("action_invalid_deposit"));
 			return;
 		}
 
@@ -192,21 +193,75 @@ public class WebInventory {
 			ps.execute();
 		}
 
-		// Update WebInventory
-		this.loadInventory();
-		this.player.updateInventory();
+		// Refresh inventory if it is set in config
+		if (MineAuction.config.getBool("plugin.performance.refresh"))
+			this.refreshInventory();
 
 	}
 
-	public void itemWithdraw(WebInventoryMeta wim) throws Exception {
+	@SuppressWarnings({ "deprecation", "unused" })
+	public void itemWithdraw(final InventoryClickEvent event) throws Exception {
 		// Unsupported action
 		if (!this.canWithdraw) {
 			this.player.sendMessage(MineAuction.prefix + ChatColor.RED
-					+ MineAuction.lang.getString("action_invalid"));
+					+ MineAuction.lang.getString("action_invalid_withdraw"));
 			return;
 		}
 
-		// Here will be withdraw from database
+		ItemStack is = event.getCurrentItem().clone();
+
+		// Item withdraw
+		Player pl = Bukkit.getPlayer(event.getWhoClicked().getName());
+		int qty = event.getClick().isShiftClick() ? 1 : is.getAmount();
+
+		// Get item stack
+		try {
+			ResultSet rs = DatabaseUtils.getItemFromDatabase(is);
+
+			while (rs.next()) {
+				// Get item Data
+				int itemID = rs.getInt("itemID");
+				short itemDamage = rs.getShort("itemDamage");
+				int qnty = rs.getInt("qty");
+				String itemData = rs.getString("itemMeta");
+				Map<Enchantment, Integer> itemEnch = WebInventoryMeta
+						.getItemEnchantmentMap(rs.getString("enchantments"));
+
+				ItemStack stack = null;
+
+				if (itemData != null && itemData != "") {
+					// Yaml metadata
+					is = WebInventoryMeta.getItemStack(itemData);
+				} else {
+					// No yaml metadata
+					is = new ItemStack(Material.getMaterial(itemID), qnty,
+							itemDamage);
+				}
+
+				// Overwrite values
+				is.setDurability(itemDamage);
+				is.addEnchantments(itemEnch);
+
+				// Update database
+				boolean success = DatabaseUtils.updateItemInDatabase(pl, is,
+						qty);
+
+				// Update player inventory
+				if (!success) {
+					pl.sendMessage(MineAuction.prefix + ChatColor.RED
+							+ MineAuction.lang.getString("no_item_update"));
+					return;
+				}
+				WCInventory wci = new WCInventory(pl);
+				wci.addItems(is, qty);
+
+				if (MineAuction.config.getBool("plugin.performance.refresh"))
+					this.refreshInventory();
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 

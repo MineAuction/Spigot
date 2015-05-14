@@ -1,3 +1,10 @@
+a.3.1 (Build 46)
+[FIXED] Fixed an issue where users could withdraw their items when auction point type didn't support that
+[FIXED] Fixed an issue which may cause an errors when plugin was loading language package.
+
+[IMPROVED] Some minor default language change
+[IMPROVED] Minor code refactor.
+
 a.3.0: (Build 44)
 [ADDED]: Item withdraw is now fully functional.
 
