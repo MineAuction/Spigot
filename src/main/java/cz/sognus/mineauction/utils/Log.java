@@ -23,11 +23,11 @@ public class Log {
 
 	public static void error(String message) {
 		logg.log(Level.SEVERE, String.format("%s %s", "[MineAuction]", message));
-		MineAuction.plugin.onDiable();
+		MineAuction.plugin.onDisable();
 	}
 
 	public static void debug(String message) {
-		if (MineAuction.config.getBool("debug"))
+		if (MineAuction.config.getBool("plugin.general.debug"))
 			logg.log(Level.INFO, String.format("%s%s %s", "[MineAuction]",
 					"[Debug]", message));
 	}

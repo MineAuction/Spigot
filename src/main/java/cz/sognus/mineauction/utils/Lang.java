@@ -35,7 +35,7 @@ public class Lang {
 	public Lang(MineAuction plugin) {
 		this.plugin = plugin;
 		this.copyLanguageFiles();
-		this.lang = MineAuction.config.getString("lang");
+		this.lang = MineAuction.config.getString("plugin.general.lang");
 		this.loadLang();
 	}
 

@@ -18,6 +18,21 @@ import org.bukkit.plugin.java.JavaPlugin;
  * 
  * @author Sognus
  * 
+ * 
+ * TODO: Command pro registraci uživatele v databázi přímo a configurace (security)
+ * TODO: Command pro registraci uživatele v databázi nepřímo za pomocí jednorázového dočasného pinu + configurace (security)
+ * TODO: Command pro přímou změnu uživatelského hesla v databázi [potřebuju domluvit strukturu db se Sekim]
+ * TODO: Command pro nepřímou změnu uživatelského hesla v databázi za pomocí dočasného pinu generovaného ve hře
+ * TODO: Admin command pro otevírání různých druhů inventáře bez cedulky
+ * TODO: Dodělat logování zakládání aukčních bodů [potřebuju se domluvit se Sekim na struktuře db]
+ * TODO: Dodělat experimentální ochranu cedulek (přes bedrock), vyžaduje logování cedulek
+ * TODO: Vytvořit několik různých tasků které budou oznamovat informace ve hře
+ * 
+ * POZDĚJI:
+ * TODO: Rušení cedulek z webové části, cedulka se nesmaže z databáze, připraví se na smazání a ve hře ji smaže task.
+ * TODO: Vytvořit task který na základě logů bude oznamovat hráčům itemy které nakoupili/prodali
+ * TODO: Vymyslet system konfigurovani tasku (např. jak dlouhou prodlevu budou mít)
+ * 
  */
 public class MineAuction extends JavaPlugin {
 
@@ -63,6 +78,9 @@ public class MineAuction extends JavaPlugin {
 		// Print debug information
 		Log.debug("This plugin is now running in debug mode");
 		Log.debug("Main class: " + this.getClass().getName());
+		
+		// Check database
+		db.createTables();
 	}
 
 	public void onReload() {
@@ -75,7 +93,7 @@ public class MineAuction extends JavaPlugin {
 		MineAuction.lang = new Lang(this);
 	}
 
-	public void onDiable() {
+	public void onDisable() {
 		WebInventory.forceCloseAll();
 
 		for (Player p : Bukkit.getOnlinePlayers()) {

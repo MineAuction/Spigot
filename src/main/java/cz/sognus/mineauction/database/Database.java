@@ -33,11 +33,14 @@ public class Database {
 
 	public Database(Plugin plugin) {
 		this.plugin = plugin;
-		this.hostname = MineAuction.config.getString("plugin.general.mysql.host");
+		this.hostname = MineAuction.config
+				.getString("plugin.general.mysql.host");
 		this.port = MineAuction.config.getString("plugin.general.mysql.port");
-		this.database = MineAuction.config.getString("plugin.general.mysql.database");
+		this.database = MineAuction.config
+				.getString("plugin.general.mysql.database");
 		this.user = MineAuction.config.getString("plugin.general.mysql.user");
-		this.password = MineAuction.config.getString("plugin.general.mysql.password");
+		this.password = MineAuction.config
+				.getString("plugin.general.mysql.password");
 		this.connection = null;
 	}
 
@@ -153,12 +156,13 @@ public class Database {
 					.split(";");
 			Log.debug("Creating DB table");
 			for (String query : queries) {
-				s.execute(query);
+				if (query != null && query != "")
+					s.execute(query);
 			}
 		} catch (Exception e) {
-			if (MineAuction.config.getBool("debug"))
-				e.printStackTrace();
-			MineAuction.plugin.onDisable();
+			if (MineAuction.config.getBool("plugin.general.debug")) {
+				Log.debug("Failed to execute query!");
+			}
 		} finally {
 			try {
 				if (s != null)
