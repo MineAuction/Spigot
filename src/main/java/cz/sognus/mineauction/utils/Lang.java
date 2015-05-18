@@ -23,7 +23,7 @@ import cz.sognus.mineauction.MineAuction;
  * @author Sognus
  * 
  * 
- * TODO: Opravit nemožnost editovat soubor pokud je zapnut server
+ *         TODO: Opravit nemožnost editovat soubor po reloadu pluginu (file lock)
  */
 public class Lang {
 
@@ -32,7 +32,7 @@ public class Lang {
 	private MineAuction plugin;
 	private String lang;
 
-	public Lang(MineAuction plugin) {
+	public Lang(MineAuction plugin) throws Exception {
 		this.plugin = plugin;
 		this.copyLanguageFiles();
 		this.lang = MineAuction.config.getString("plugin.general.lang");
@@ -40,18 +40,14 @@ public class Lang {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void loadLang() {
-		try {
-			Yaml yaml = new Yaml();
-			File file = new File(plugin.getDataFolder() + "/lang/" + lang
-					+ ".yml");
-			InputStream is = new FileInputStream(file);
-			Map<String, Object> result = (Map<String, Object>) yaml.load(is);
-			messages.putAll(result);
-			is.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+	public void loadLang() throws Exception {
+		Yaml yaml = new Yaml();
+		File file = new File(plugin.getDataFolder() + "/lang/" + lang + ".yml");
+		InputStream is = new FileInputStream(file);
+		Map<String, Object> result = (Map<String, Object>) yaml.load(is);
+		messages.putAll(result);
+		is.close();
+		file.setWritable(true);
 	}
 
 	public void copyLanguageFiles() {
@@ -90,6 +86,7 @@ public class Lang {
 						while ((c = inStream.read()) != -1) {
 							out.write(c);
 						}
+						eFile.setWritable(true);
 						inStream.close();
 						out.close();
 
@@ -121,9 +118,10 @@ public class Lang {
 			FileWriter writer = new FileWriter(file);
 			data.put(key, "<<Required content not found>>");
 			yaml.dump(data, writer);
-			
+
 			writer.close();
 			is.close();
+			file.setWritable(true);
 
 			return "<<Required content not found>>";
 		} catch (Exception e) {
@@ -134,15 +132,13 @@ public class Lang {
 		return "<<An error occurred while trying to get language content>>";
 
 	}
-	
-	public static void deleteLangFiles()
-	{
+
+	public static void deleteLangFiles() {
 		File dir = new File(MineAuction.plugin.getDataFolder() + "/lang/");
-		for(File file: dir.listFiles()) 
-		{
+		for (File file : dir.listFiles()) {
 			file.delete();
 		}
-		
+
 	}
 
 }

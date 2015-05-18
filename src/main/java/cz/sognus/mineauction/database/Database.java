@@ -20,6 +20,7 @@ import cz.sognus.mineauction.utils.Log;
  * 
  * @author -_Husky_-
  * @author tips48
+ * @author Sognus
  */
 public class Database {
 	private final String user;
@@ -44,20 +45,11 @@ public class Database {
 		this.connection = null;
 	}
 
-	public Connection openConnection() {
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			connection = DriverManager.getConnection("jdbc:mysql://"
-					+ this.hostname + ":" + this.port + "/" + this.database,
-					this.user, this.password);
-		} catch (SQLException e) {
-			plugin.getLogger().log(
-					Level.SEVERE,
-					"Could not connect to MySQL server! because: "
-							+ e.getMessage());
-		} catch (ClassNotFoundException e) {
-			plugin.getLogger().log(Level.SEVERE, "JDBC Driver not found!");
-		}
+	public Connection openConnection() throws Exception {
+		Class.forName("com.mysql.jdbc.Driver");
+		connection = DriverManager.getConnection("jdbc:mysql://"
+				+ this.hostname + ":" + this.port + "/" + this.database,
+				this.user, this.password);
 		return connection;
 	}
 
@@ -65,7 +57,7 @@ public class Database {
 		return connection != null;
 	}
 
-	public Connection getConnection() {
+	public Connection getConnection() throws Exception {
 		openConnection();
 		return connection;
 	}
@@ -75,102 +67,40 @@ public class Database {
 			try {
 				connection.close();
 			} catch (SQLException e) {
-				plugin.getLogger().log(Level.SEVERE,
-						"Error closing the MySQL Connection!");
-				e.printStackTrace();
+				if (MineAuction.enabled) {
+					plugin.getLogger().log(Level.SEVERE,
+							"Error closing the MySQL Connection!");
+					e.printStackTrace();
+					plugin.onDisable();
+				}
 			}
 		}
 	}
 
-	public ResultSet querySQL(String query) {
-		Connection c = null;
-
-		if (checkConnection()) {
-			c = getConnection();
-		} else {
-			c = openConnection();
-		}
-
-		Statement s = null;
-
-		try {
-			s = c.createStatement();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
-
-		ResultSet ret = null;
-
-		try {
-			ret = s.executeQuery(query);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-
-		closeConnection();
-
-		return ret;
-	}
-
-	public void updateSQL(String update) {
-
-		Connection c = null;
-
-		if (checkConnection()) {
-			c = getConnection();
-		} else {
-			c = openConnection();
-		}
-
-		Statement s = null;
-
-		try {
-			s = c.createStatement();
-			s.executeUpdate(update);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
-
-		closeConnection();
-
-	}
-
 	// Sognus code:
-	public void createTables() {
-		Log.info("Checking database structure");
+	public void createTables() throws Exception {
+		if (!MineAuction.enabled) return;
+		
 		Connection c = null;
 		Statement s = null;
 
-		try {
-			c = MineAuction.db.openConnection();
-			s = c.createStatement();
+		c = MineAuction.db.openConnection();
+		s = c.createStatement();
 
-			if (plugin.getResource("create.sql") == null) {
+		if (plugin.getResource("create.sql") == null) {
+			if (MineAuction.enabled) {
 				Log.error("Unable to find create.sql, disabling plugin");
 				MineAuction.plugin.onDisable();
 				return;
 			}
+		}
 
-			String[] queries = CharStreams.toString(
-					new InputStreamReader(plugin.getResource("create.sql")))
-					.split(";");
-			Log.debug("Creating DB table");
-			for (String query : queries) {
-				if (query != null && query != "")
-					s.execute(query);
-			}
-		} catch (Exception e) {
-			if (MineAuction.config.getBool("plugin.general.debug")) {
-				Log.debug("Failed to execute query!");
-			}
-		} finally {
-			try {
-				if (s != null)
-					s.close();
-				c.close();
-			} catch (Exception e) {
-				Log.error("Unable to close connection.");
-			}
+		String[] queries = CharStreams.toString(
+				new InputStreamReader(plugin.getResource("create.sql"))).split(
+				";");
+		for (String query : queries) {
+			if (query != null && query != "")
+				s.execute(query);
 		}
 	}
 }

@@ -12,27 +12,63 @@ import cz.sognus.mineauction.utils.Log;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
  * 
  * @author Sognus
  * 
+ *         Czech only todo-list:
  * 
- * TODO: Command pro registraci uživatele v databázi přímo a configurace (security)
- * TODO: Command pro registraci uživatele v databázi nepřímo za pomocí jednorázového dočasného pinu + configurace (security)
- * TODO: Command pro přímou změnu uživatelského hesla v databázi [potřebuju domluvit strukturu db se Sekim]
- * TODO: Command pro nepřímou změnu uživatelského hesla v databázi za pomocí dočasného pinu generovaného ve hře
- * TODO: Admin command pro otevírání různých druhů inventáře bez cedulky
- * TODO: Dodělat logování zakládání aukčních bodů [potřebuju se domluvit se Sekim na struktuře db]
- * TODO: Dodělat experimentální ochranu cedulek (přes bedrock), vyžaduje logování cedulek
- * TODO: Vytvořit několik různých tasků které budou oznamovat informace ve hře
+ *         DŮLEŽITÉ:
+ *         TODO: Implementovat zbytek commandů a permissí
  * 
- * POZDĚJI:
- * TODO: Rušení cedulek z webové části, cedulka se nesmaže z databáze, připraví se na smazání a ve hře ji smaže task.
- * TODO: Vytvořit task který na základě logů bude oznamovat hráčům itemy které nakoupili/prodali
- * TODO: Vymyslet system konfigurovani tasku (např. jak dlouhou prodlevu budou mít)
+ *         GENERAL:
+ *         TODO: Command pro registraci uživatele v databázi přímo a
+ *         configurace (security)
+ *         TODO: Command pro registraci uživatele v
+ *         databázi nepřímo za pomocí jednorázového dočasného pinu + configurace
+ *         (security)
+ *         TODO: Command pro přímou změnu uživatelského hesla v
+ *         databázi [potřebuju domluvit strukturu db se Sekim]
+ *         TODO: Command pro
+ *         nepřímou změnu uživatelského hesla v databázi za pomocí dočasného
+ *         pinu generovaného ve hře
+ *         TODO: Admin command pro otevírání různých
+ *         druhů inventáře bez cedulky
+ *         TODO: Dodělat logování zakládání aukčních
+ *         bodů [potřebuju se domluvit se Sekim na struktuře db] TODO: Dodělat
+ *         experimentální ochranu cedulek (přes bedrock), vyžaduje logování
+ *         cedulek
+ *         TODO: Vytvořit několik různých tasků které budou oznamovat
+ *         informace ve hře
  * 
+ *         POZDĚJI: 
+ *         TODO: Rušení cedulek z webové části, cedulka se nesmaže z
+ *         databáze, připraví se na smazání a ve hře ji smaže task. TODO:
+ *         Vytvořit task který na základě logů bude oznamovat hráčům itemy které
+ *         nakoupili/prodali 
+ *         TODO: Vymyslet system konfigurovani tasku (např.
+ *         jak dlouhou prodlevu budou mít)
+ * 
+ *         VYŘEŠENÍ BUDOUCÍCH PROBLÉMŮ: 
+ *         TODO: Vytvořit různé stavy pluginu,
+ *         pokud všechny části nejsou OK, plugin pouze bude chránit cedulky,
+ *         pokud jsou OK, plugin bude fungovat normálně
+ *         TODO: Ochrana cedulek
+ *         bude pravděpodobně vyžadovat jiný eventListener, checknout připojení
+ *         k databázi (není || ochrana (logování disabled = stará ochrana
+ *         cedulek, rušení včetně bedrocku, je && ochrana enabled = ochrana
+ *         cedulek či logování)
+ * 
+ *         OSTATNÍ: 
+ *         TODO: Vytvořit ochranu proti serverům s online-mode = false
+ *         TODO: Vytvořit updatování pluginu, zkontrolovat řešení přes složku
+ *         update, configurovatelné
  */
 public class MineAuction extends JavaPlugin {
 
@@ -46,8 +82,14 @@ public class MineAuction extends JavaPlugin {
 	public static Config config;
 	public static Lang lang;
 	public static Database db;
+	public static boolean enabled = true;
 
 	public static Log logger;
+
+	// Listeners
+	public static MineAuctionBlockListener blockListener;
+	public static MineAuctionPlayerListener playerListener;
+	public static MineAuctionInventoryListener inventoryListener;
 
 	@Override
 	public void onEnable() {
@@ -56,49 +98,188 @@ public class MineAuction extends JavaPlugin {
 		name = this.getDescription().getName();
 		version = this.getDescription().getVersion();
 
-		plugin = this;
-		config = new Config(this);
-		lang = new Lang(this);
+		// Text
+		getServer().getConsoleSender().sendMessage(
+				ChatColor.RESET
+						+ "*********** Enabling MineAuction ***********");
 
-		// Database
-		db = new Database(this);
-		db.openConnection();
+		// Setting current instance up
+		plugin = this;
+		getServer().getConsoleSender().sendMessage(
+				MineAuction.prefix + "Setting instance [ " + ChatColor.GREEN
+						+ "OK" + ChatColor.RESET + " ]");
+
+		// Setting configuration up
+		config = new Config(this);
+		getServer().getConsoleSender().sendMessage(
+				MineAuction.prefix + "Loading configuration [ "
+						+ ChatColor.GREEN + "OK" + ChatColor.RESET + " ]");
+
+		// Setting lang up
+		try {
+			lang = new Lang(this);
+			getServer().getConsoleSender().sendMessage(
+					MineAuction.prefix + "Loading language files [ "
+							+ ChatColor.GREEN + "OK" + ChatColor.RESET + " ]");
+		} catch (Exception e) {
+			getServer().getConsoleSender()
+					.sendMessage(
+							MineAuction.prefix + "Loading configuration [ "
+									+ ChatColor.RED + "FAILED"
+									+ ChatColor.RESET + " ]");
+			getServer().getConsoleSender().sendMessage(
+					ChatColor.WHITE
+							+ "********************************************");
+			getServer().getConsoleSender().sendMessage("Stacktrace: ");
+			e.printStackTrace();
+			onDisable();
+			return;
+		}
+
+		// Setting database up
+		try {
+			db = new Database(this);
+			db.openConnection();
+			getServer().getConsoleSender().sendMessage(
+					MineAuction.prefix + "Connecting to database [ "
+							+ ChatColor.GREEN + "OK" + ChatColor.RESET + " ]");
+		} catch (Exception e) {
+			getServer().getConsoleSender()
+					.sendMessage(
+							MineAuction.prefix + "Connecting to database [ "
+									+ ChatColor.RED + "FAILED"
+									+ ChatColor.RESET + " ]");
+			getServer().getConsoleSender().sendMessage(
+					ChatColor.RESET
+							+ "********************************************");
+			getServer().getConsoleSender().sendMessage("Info: ");
+			getServer().getConsoleSender().sendMessage(
+					"Database exception occured: " + e.getMessage());
+			onDisable();
+			return;
+
+		}
 
 		// Register listeners
-		getServer().getPluginManager().registerEvents(
-				new MineAuctionBlockListener(this), this);
-		getServer().getPluginManager().registerEvents(
-				new MineAuctionPlayerListener(this), this);
-		getServer().getPluginManager().registerEvents(
-				new MineAuctionInventoryListener(this), this);
+		blockListener = new MineAuctionBlockListener(this);
+		playerListener = new MineAuctionPlayerListener(this);
+		inventoryListener = new MineAuctionInventoryListener(this);
+
+		getServer().getPluginManager().registerEvents(blockListener, this);
+		getServer().getPluginManager().registerEvents(playerListener, this);
+		getServer().getPluginManager().registerEvents(inventoryListener, this);
 
 		// Register command listener
 		this.getCommand("ma").setExecutor(new MineAuctionCommands(this));
 
 		// Print debug information
-		Log.debug("This plugin is now running in debug mode");
-		Log.debug("Main class: " + this.getClass().getName());
-		
+
 		// Check database
-		db.createTables();
+		try {
+			db.createTables();
+			getServer().getConsoleSender().sendMessage(
+					MineAuction.prefix + "Checking database structure [ "
+							+ ChatColor.GREEN + "OK" + ChatColor.RESET + " ]");
+		} catch (Exception e) {
+			getServer().getConsoleSender()
+					.sendMessage(
+							MineAuction.prefix
+									+ "Checking database structure [ "
+									+ ChatColor.RED + "FAILED"
+									+ ChatColor.RESET + " ]");
+			getServer().getConsoleSender().sendMessage(
+					ChatColor.WHITE
+							+ "********************************************");
+			getServer().getConsoleSender().sendMessage("Info: ");
+			Log.info("Database exception occured: " + e.getMessage());
+			onDisable();
+			return;
+		}
+		
+		// End Text
+		getServer().getConsoleSender().sendMessage(
+				ChatColor.RESET
+						+ "********************************************");
+
+		// Plugin is OK
+		if (enabled) {
+			Log.debug("This plugin is now running in debug mode");
+			Log.debug("Main class: " + this.getClass().getName());
+		}
+
+		// Enable features
+		enabled = true;
 	}
 
 	public void onReload() {
 		onDisable();
 		onEnable();
 	}
-	
-	public void reloadLang()
-	{
-		MineAuction.lang = new Lang(this);
+
+	public void reloadLang() {
+		try {
+			MineAuction.lang = new Lang(this);
+			getServer().getConsoleSender().sendMessage(
+					MineAuction.prefix + "Reloading language files [ "
+							+ ChatColor.GREEN + "OK" + ChatColor.RESET + " ]");
+		} catch (Exception e) {
+			getServer().getConsoleSender()
+					.sendMessage(
+							MineAuction.prefix + "Reloading language files [ "
+									+ ChatColor.RED + "FAILED"
+									+ ChatColor.RESET + " ]");
+			getServer().getConsoleSender().sendMessage("Info: ");
+			e.printStackTrace();
+			onDisable();
+			return;
+
+		}
 	}
 
 	public void onDisable() {
+		if (!enabled)
+			return;
+
+		getServer().getConsoleSender().sendMessage(
+				ChatColor.RESET
+						+ "****** MineAuction is being disabled *******");
+
+		// Close all virtual inventories
+		getServer().getConsoleSender().sendMessage(
+				prefix + ChatColor.RESET + "Closing virtual inventories");
 		WebInventory.forceCloseAll();
 
 		for (Player p : Bukkit.getOnlinePlayers()) {
 			p.closeInventory();
 		}
+
+		// Unregister event
+		getServer().getConsoleSender().sendMessage(
+				prefix + ChatColor.RESET + "Unregistering listeners");
+		PlayerInteractEvent.getHandlerList().unregister(playerListener);
+		PlayerJoinEvent.getHandlerList().unregister(playerListener);
+		InventoryClickEvent.getHandlerList().unregister(inventoryListener);
+		InventoryCloseEvent.getHandlerList().unregister(inventoryListener);
+
+		getServer().getConsoleSender().sendMessage(
+				ChatColor.RESET
+						+ "********************************************");
+
+		enabled = false;
+	}
+
+	public void onDisableNoConsole() {
+		WebInventory.forceCloseAll();
+
+		for (Player p : Bukkit.getOnlinePlayers()) {
+			p.closeInventory();
+		}
+
+		PlayerInteractEvent.getHandlerList().unregister(playerListener);
+		PlayerJoinEvent.getHandlerList().unregister(playerListener);
+		InventoryClickEvent.getHandlerList().unregister(inventoryListener);
+		InventoryCloseEvent.getHandlerList().unregister(inventoryListener);
+
 	}
 
 }

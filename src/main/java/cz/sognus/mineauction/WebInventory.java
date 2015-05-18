@@ -168,14 +168,15 @@ public class WebInventory {
 				&& wim.getItemStack().getMaxStackSize() > 1) {
 
 			ps = conn
-					.prepareStatement("UPDATE ma_items SET qty = qty + ? WHERE playerID = ? AND itemID= ? AND itemDamage = ? AND itemMeta = ? AND enchantments = ? AND lore = ?");
+					.prepareStatement("UPDATE ma_items SET qty = qty + ? WHERE playerID = ? AND itemID= ? AND itemDamage = ? AND enchantments = ? AND lore = ?");
 			ps.setInt(1, wim.getItemQty());
 			ps.setInt(2, DatabaseUtils.getPlayerId(this.player.getUniqueId()));
 			ps.setInt(3, wim.getId());
 			ps.setShort(4, wim.getDurability());
-			ps.setString(5, wim.getItemMeta());
-			ps.setString(6, wim.getItemEnchantments());
-			ps.setString(7, wim.getLore());
+			ps.setString(5, wim.getItemEnchantments());
+			ps.setString(6, wim.getLore());
+			
+			Bukkit.broadcastMessage("SQL: "+ps.toString());
 
 			ps.executeUpdate();
 		} else {

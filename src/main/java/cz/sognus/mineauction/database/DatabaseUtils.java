@@ -61,12 +61,13 @@ public class DatabaseUtils {
 	}
 
 	public static int getPlayerId(UUID playerUUID) {
-		Connection conn = MineAuction.db.getConnection();
 		PreparedStatement st = null;
 		ResultSet rs = null;
 		int output = 0;
 
 		try {
+			Connection conn = MineAuction.db.getConnection();
+
 			st = conn
 					.prepareStatement("SELECT * FROM ma_players WHERE uuid = ?  LIMIT 1");
 			st.setString(1, playerUUID.toString());
