@@ -37,7 +37,7 @@ public class MineAuctionBlockListener implements Listener {
 				|| block.getType() == Material.SIGN_POST) {
 
 			Sign s = (Sign) block.getState();
-			if (s.getLine(0).equals("[MineAuction]")) {
+			if (s.getLine(0).equals("[MineAuction]") && (s.getLine(1).equalsIgnoreCase("mailbox") || s.getLine(1).equalsIgnoreCase("withdraw") || s.getLine(1).equalsIgnoreCase("deposit"))) {
 				if (!p.hasPermission("ma.admin.remove")) {
 					e.setCancelled(true);
 					p.sendMessage(MineAuction.prefix + ChatColor.RED
@@ -55,7 +55,6 @@ public class MineAuctionBlockListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onSignChange(SignChangeEvent e) {
 		String[] lines = e.getLines();
-
 		Player p = e.getPlayer();
 
 		if (p == null)
@@ -84,18 +83,28 @@ public class MineAuctionBlockListener implements Listener {
 		default:
 			p.sendMessage(MineAuction.prefix + ChatColor.RED
 					+ MineAuction.lang.getString("sign_invalid"));
+			e.setLine(0, "");
+			e.setLine(1, "");
+			e.setLine(2, "");
+			e.setLine(3, "");
 			return;
 		}
 
 		if (p.hasPermission("ma.admin.create." + type.toLowerCase())) {
 			e.setLine(0, "[MineAuction]");
 			e.setLine(1, type);
+			e.setLine(2, "");
+			e.setLine(3, "");
 			p.sendMessage(MineAuction.prefix + ChatColor.GREEN
 					+ MineAuction.lang.getString(langString));
 		} else {
 			e.setCancelled(true);
 			p.sendMessage(MineAuction.prefix + ChatColor.RED
 					+ MineAuction.lang.getString("no_permission"));
+			e.setLine(0, "");
+			e.setLine(1, "");
+			e.setLine(2, "");
+			e.setLine(3, "");
 		}
 
 	}

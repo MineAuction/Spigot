@@ -146,7 +146,7 @@ public class WebInventory {
 		this.player.updateInventory();
 	}
 
-	public boolean itemDeposit(WebInventoryMeta wim) throws Exception {
+	public boolean itemDeposit(WebInventoryMeta wim) {
 		// Unsupported action
 		if (!this.canDeposit) {
 			this.player.sendMessage(MineAuction.prefix + ChatColor.RED
@@ -154,56 +154,62 @@ public class WebInventory {
 			return false;
 		}
 
-		// Save item to database
-		// exist in database (a - update, b - insert)
-		Connection conn = MineAuction.db.getConnection();
-		PreparedStatement ps = null;
+		try {
+			// Save item to database
+			// exist in database (a - update, b - insert)
+			Connection conn = MineAuction.db.getConnection();
+			PreparedStatement ps = null;
 
-		// Fix duplicite items records, restack them at database
-		// DatabaseUtils.fixItemStacking()
+			// Fix duplicite items records, restack them at database
+			// DatabaseUtils.fixItemStacking()
 
-		// Same item is in database, update him
-		if (DatabaseUtils.isItemInDatabase(wim,
-				DatabaseUtils.getPlayerId(this.player.getUniqueId()))
-				&& wim.getItemStack().getMaxStackSize() > 1) {
+			// Same item is in database, update him
+			if (DatabaseUtils.isItemInDatabase(wim,
+					DatabaseUtils.getPlayerId(this.player.getUniqueId()))
+					&& wim.getItemStack().getMaxStackSize() > 1) {
 
-			ps = conn
-					.prepareStatement("UPDATE ma_items SET qty = qty + ? WHERE playerID = ? AND itemID= ? AND itemDamage = ? AND enchantments = ? AND lore = ?");
-			ps.setInt(1, wim.getItemQty());
-			ps.setInt(2, DatabaseUtils.getPlayerId(this.player.getUniqueId()));
-			ps.setInt(3, wim.getId());
-			ps.setShort(4, wim.getDurability());
-			ps.setString(5, wim.getItemEnchantments());
-			ps.setString(6, wim.getLore());
-			
-			Bukkit.broadcastMessage("SQL: "+ps.toString());
+				ps = conn
+						.prepareStatement("UPDATE ma_items SET qty = qty + ? WHERE playerID = ? AND itemID= ? AND itemDamage = ? AND enchantments = ? AND lore = ?");
+				ps.setInt(1, wim.getItemQty());
+				ps.setInt(2,
+						DatabaseUtils.getPlayerId(this.player.getUniqueId()));
+				ps.setInt(3, wim.getId());
+				ps.setShort(4, wim.getDurability());
+				ps.setString(5, wim.getItemEnchantments());
+				ps.setString(6, wim.getLore());
 
-			ps.executeUpdate();
-		} else {
+				ps.executeUpdate();
+			} else {
 
-			ps = conn
-					.prepareStatement("INSERT INTO `ma_items` (`playerID`, `itemID`, `itemDamage`, `qty`, `itemMeta`, `enchantments`, `lore`) VALUES (?, ?, ?,?, ?, ?, ?)");
-			ps.setInt(1, DatabaseUtils.getPlayerId(this.player.getUniqueId()));
-			ps.setInt(2, wim.getId());
-			ps.setShort(3, wim.getDurability());
-			ps.setInt(4, wim.getItemQty());
-			ps.setString(5, wim.getItemMeta());
-			ps.setString(6, wim.getItemEnchantments());
-			ps.setString(7, wim.getLore());
+				ps = conn
+						.prepareStatement("INSERT INTO `ma_items` (`playerID`, `itemID`, `itemDamage`, `qty`, `itemMeta`, `enchantments`, `lore`) VALUES (?, ?, ?,?, ?, ?, ?)");
+				ps.setInt(1,
+						DatabaseUtils.getPlayerId(this.player.getUniqueId()));
+				ps.setInt(2, wim.getId());
+				ps.setShort(3, wim.getDurability());
+				ps.setInt(4, wim.getItemQty());
+				ps.setString(5, wim.getItemMeta());
+				ps.setString(6, wim.getItemEnchantments());
+				ps.setString(7, wim.getLore());
 
-			ps.execute();
+				ps.execute();
+			}
+
+			// Refresh inventory if it is set in config
+			if (MineAuction.config.getBool("plugin.performance.refresh"))
+				this.refreshInventory();
+
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
 		}
-
-		// Refresh inventory if it is set in config
-		if (MineAuction.config.getBool("plugin.performance.refresh"))
-			this.refreshInventory();
-		
-		return true;
 
 	}
 
 	@SuppressWarnings({ "deprecation", "unused" })
-	public boolean itemWithdraw(final InventoryClickEvent event) throws Exception {
+	public boolean itemWithdraw(final InventoryClickEvent event)
+			throws Exception {
 		// Unsupported action
 		if (!this.canWithdraw) {
 			this.player.sendMessage(MineAuction.prefix + ChatColor.RED
@@ -260,7 +266,7 @@ public class WebInventory {
 
 				if (MineAuction.config.getBool("plugin.performance.refresh"))
 					this.refreshInventory();
-				
+
 				return true;
 			}
 
