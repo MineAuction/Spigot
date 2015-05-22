@@ -25,6 +25,7 @@
 				<filtering>true</filtering>
 				<includes>
 					<include>plugin.yml</include>
+					<include>create.sql</include>
 				</includes>
 			</resource>
 		</resources>
