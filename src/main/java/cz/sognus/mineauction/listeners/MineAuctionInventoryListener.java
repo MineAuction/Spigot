@@ -1,6 +1,7 @@
 package cz.sognus.mineauction.listeners;
 
 import java.sql.ResultSet;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,10 +16,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -72,7 +76,101 @@ public class MineAuctionInventoryListener implements Listener {
 
 	}
 
-	// MineAuction inventory click event
+	// MineAuction inventory click event	
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onInventoryClick(final InventoryClickEvent event) {
+		// this event is only for MineAuction
+		if (!event.getInventory().getTitle().contains("[MineAuction]")){
+			return;
+		}
+		
+		// click out of inventory
+		if (event.getClickedInventory() == null){
+			return;
+		}
+			
+		
+		String eventString = event.getAction().name();
+		Bukkit.broadcastMessage(eventString);
+		
+		// test for available actions
+		String[] availableActions = {
+				"" + InventoryAction.PLACE_ALL, 
+				"" + InventoryAction.PLACE_ONE,
+				"" + InventoryAction.MOVE_TO_OTHER_INVENTORY, 
+				"" + InventoryAction.PLACE_SOME, 
+		};		
+		if(Arrays.asList(availableActions).contains(eventString)){
+			Bukkit.broadcastMessage("podporovana akce" + eventString);
+		}
+		
+		//event.setCancelled(true);
+
+		
+		// Ignore click if inventory slot contains AIR
+		ItemStack is = event.getCurrentItem().clone();
+		if (is.getType() == Material.AIR)
+			return;
+
+		
+		Inventory inventory = event.getInventory();
+		Inventory clickedInventory = event.getClickedInventory();
+		String whoClicked = event.getWhoClicked().getName();
+		
+		// operations
+		if (clickedInventory.getTitle().startsWith("[MineAuction]")) {
+			// WEB INVENTORY ACTIONS
+			Bukkit.broadcastMessage("web: " + clickedInventory.getTitle());
+			
+			
+			// sognus
+			WebInventory wi = WebInventory.getInstance(whoClicked);
+			
+			// Fix handler for invClick issued after reload
+			if(wi == null)
+			{
+				event.getWhoClicked().closeInventory();
+				return;
+			}
+			
+			try {
+				wi.itemWithdraw(event);
+			} catch (Exception e) {
+
+				e.printStackTrace();
+			}
+			
+		}
+		else{
+			// PLAYER INVENTORY ACTIONS
+			Bukkit.broadcastMessage("player: " + clickedInventory.getTitle());
+			
+			// sognus
+			WebInventory wi = WebInventory.getInstance(whoClicked);
+			Player p = Bukkit.getPlayer(whoClicked);
+
+			try {
+				ItemStack istmp = is.clone();
+				if (event.getClick().isShiftClick())
+					istmp.setAmount(1);
+				boolean depositOK = wi.itemDeposit(new WebInventoryMeta(istmp));
+				
+				if(!depositOK) return;
+
+				// Vymazani itemy z inventare
+				WCInventory wci = new WCInventory(p);
+				int output = event.getClick().isShiftClick() ? wci.removeItems(
+						is, 1) : wci.removeItems(is, is.getAmount());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		
+	}
+
+	/*
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onInventoryClick(final InventoryClickEvent event) {
 		if (!event.getInventory().getTitle().contains("[MineAuction]"))
@@ -140,4 +238,5 @@ public class MineAuctionInventoryListener implements Listener {
 		// event.setCancelled(true);
 
 	}
+	*/
 }
