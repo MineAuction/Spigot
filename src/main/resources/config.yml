@@ -29,11 +29,11 @@ plugin:
     logging:
       actions:
       # Log every single item deposit to database
-      deposit: false
+        deposit: false
       # Log every single item withdraw from database
-      withdraw: false
-      # Log creating and destroying auction points
-      signs: false
+        withdraw: false
+      # Log auction points events
+      signs: true
   #
   # Configure stuff that may be reason of lower performance
   #

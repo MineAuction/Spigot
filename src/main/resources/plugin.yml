@@ -9,3 +9,37 @@ commands:
     description: Main command for this plugin
     aliases: [mineauction, auction, aukce]
     usage: /<command> help
+
+permissions:
+  ma.*:
+    description: Gives access to all MineAuction features
+    default: false
+    children:
+      ma.admin.*: true
+      ma.use.*: true
+    ma.admin.*:
+      description: Gives access to all admin features
+      default: false
+      children:
+        ma.admin.reload: true
+        ma.admin.lang.reload: true
+        ma.admin.lang.reset: true
+        ma.admin.remove: true
+        ma.admin.config.reload: true
+        ma.admin.create.*: true
+      ma.admin.create.*:
+        description: Gives access to create all sign types
+        default: false
+        children:
+          ma.admin.create.deposit: true
+          ma.admin.create.withdraw: true
+          ma.admin.create.mailbox: true
+    ma.use.*:
+      description: Gives access to use signs
+      default: true
+      children:
+        ma.use.mailbox: true
+        ma.use.deposit: true
+        ma.use.withdraw: true        
+        
+     

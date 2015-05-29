@@ -12,6 +12,8 @@ import cz.sognus.mineauction.utils.Log;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -24,51 +26,22 @@ import org.bukkit.plugin.java.JavaPlugin;
  * 
  *         Czech only todo-list:
  * 
- *         DŮLEŽITÉ:
- *         TODO: Implementovat zbytek commandů a permissí
+ *         DŮLEŽITÉ: TODO: Implementovat zbytek commandů a permissí
  * 
- *         GENERAL:
- *         TODO: Command pro registraci uživatele v databázi přímo a
- *         configurace (security)
- *         TODO: Command pro registraci uživatele v
- *         databázi nepřímo za pomocí jednorázového dočasného pinu + configurace
- *         (security)
- *         TODO: Command pro přímou změnu uživatelského hesla v
- *         databázi [potřebuju domluvit strukturu db se Sekim]
- *         TODO: Command pro
- *         nepřímou změnu uživatelského hesla v databázi za pomocí dočasného
- *         pinu generovaného ve hře
- *         TODO: Admin command pro otevírání různých
- *         druhů inventáře bez cedulky
- *         TODO: Dodělat logování zakládání aukčních
- *         bodů [potřebuju se domluvit se Sekim na struktuře db] TODO: Dodělat
- *         experimentální ochranu cedulek (přes bedrock), vyžaduje logování
- *         cedulek
- *         TODO: Vytvořit několik různých tasků které budou oznamovat
- *         informace ve hře
+ *         GENERAL: TODO: Admin command pro otevírání různých druhů inventáře
+ *         bez cedulky TODO: Vytvořit několik různých tasků které budou
+ *         oznamovat informace ve hře
  * 
- *         POZDĚJI: 
- *         TODO: Rušení cedulek z webové části, cedulka se nesmaže z
+ *         POZDĚJI: TODO: Rušení cedulek z webové části, cedulka se nesmaže z
  *         databáze, připraví se na smazání a ve hře ji smaže task. TODO:
  *         Vytvořit task který na základě logů bude oznamovat hráčům itemy které
- *         nakoupili/prodali 
- *         TODO: Vymyslet system konfigurovani tasku (např.
+ *         nakoupili/prodali TODO: Vymyslet system konfigurovani tasku (např.
  *         jak dlouhou prodlevu budou mít)
- * 
- *         VYŘEŠENÍ BUDOUCÍCH PROBLÉMŮ: 
- *         TODO: Vytvořit různé stavy pluginu,
- *         pokud všechny části nejsou OK, plugin pouze bude chránit cedulky,
- *         pokud jsou OK, plugin bude fungovat normálně
- *         TODO: Ochrana cedulek
- *         bude pravděpodobně vyžadovat jiný eventListener, checknout připojení
- *         k databázi (není || ochrana (logování disabled = stará ochrana
- *         cedulek, rušení včetně bedrocku, je && ochrana enabled = ochrana
- *         cedulek či logování)
- * 
- *         OSTATNÍ: 
- *         TODO: Vytvořit ochranu proti serverům s online-mode = false
- *         TODO: Vytvořit updatování pluginu, zkontrolovat řešení přes složku
- *         update, configurovatelné
+ *         TODO: Nespustit plugin, pokud je přiliš stará verze serveru
+ *         
+ *         ENHANCEMENT:
+ *         TODO: Zvážit vytvoření nového event listeneru na vybírání a vkládání
+ *         použít možnost dragování z inventáře do inventáře.
  */
 public class MineAuction extends JavaPlugin {
 
@@ -192,10 +165,11 @@ public class MineAuction extends JavaPlugin {
 							+ "********************************************");
 			getServer().getConsoleSender().sendMessage("Info: ");
 			Log.info("Database exception occured: " + e.getMessage());
+			e.printStackTrace();
 			onDisable();
 			return;
 		}
-		
+
 		// End Text
 		getServer().getConsoleSender().sendMessage(
 				ChatColor.RESET
@@ -275,10 +249,15 @@ public class MineAuction extends JavaPlugin {
 			p.closeInventory();
 		}
 
+		// Unregister events
 		PlayerInteractEvent.getHandlerList().unregister(playerListener);
 		PlayerJoinEvent.getHandlerList().unregister(playerListener);
 		InventoryClickEvent.getHandlerList().unregister(inventoryListener);
 		InventoryCloseEvent.getHandlerList().unregister(inventoryListener);
+		BlockBreakEvent.getHandlerList().unregister(blockListener);
+		SignChangeEvent.getHandlerList().unregister(blockListener);
+
+		enabled = false;
 
 	}
 

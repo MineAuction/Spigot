@@ -10,6 +10,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 
 import cz.sognus.mineauction.MineAuction;
+import cz.sognus.mineauction.database.DatabaseUtils;
 import cz.sognus.mineauction.utils.Lang;
 
 public class MineAuctionCommands implements CommandExecutor {
@@ -118,7 +119,7 @@ public class MineAuctionCommands implements CommandExecutor {
 				// Command: ma config reload
 				if (args[0].equalsIgnoreCase("config")
 						&& args[1].equalsIgnoreCase("reload")) {
-					if (player.hasPermission("ma.admin.config.reset")) {
+					if (player.hasPermission("ma.admin.config.reload")) {
 						// TODO: Oznamovací zpráva
 						MineAuction.plugin.reloadConfig();
 						return true;
@@ -127,6 +128,19 @@ public class MineAuctionCommands implements CommandExecutor {
 								+ MineAuction.lang.getString("no_permission"));
 						return true;
 					}
+				}
+				
+				// Command: ma password <password>
+				if(args[0].equalsIgnoreCase("password"))
+				{
+					if(DatabaseUtils.getPlayerId(player.getUniqueId()) == 0)
+					{
+						DatabaseUtils.registerPlayer(player);
+						player.sendMessage(MineAuction.prefix + ChatColor.YELLOW + MineAuction.lang.getString("account_created"));
+					}
+					DatabaseUtils.updatePlayerPassword(player.getUniqueId(), args[1]);
+					player.sendMessage(MineAuction.prefix + ChatColor.GREEN + MineAuction.lang.getString("account_passwordchange"));
+					return true;
 				}
 
 				return false;

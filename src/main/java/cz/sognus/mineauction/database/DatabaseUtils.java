@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.UUID;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -270,6 +271,25 @@ public class DatabaseUtils {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	public static void updatePlayerPassword(UUID uniqueId, String password) {
+		String sha1;
+		Connection conn = null;
+		PreparedStatement ps = null;
+		try {
+			sha1 = DigestUtils.sha1Hex(password);
+			conn = MineAuction.db.getConnection();
+			ps = conn
+					.prepareStatement("UPDATE ma_players SET password=? WHERE uuid=?");
+			ps.setString(1, sha1);
+			ps.setString(2, uniqueId.toString());
+			ps.execute();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 }

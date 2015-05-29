@@ -35,7 +35,17 @@ public class MineAuctionPlayerListener implements Listener {
 	// Player login
 	@EventHandler(priority = EventPriority.NORMAL)
 	public void onPlayerJoin(PlayerJoinEvent event) {
+		try {
+			if (DatabaseUtils.getPlayerId(event.getPlayer().getUniqueId()) == 0) {
+				DatabaseUtils.registerPlayer(event.getPlayer());
+				event.getPlayer().sendMessage(MineAuction.prefix + ChatColor.YELLOW + MineAuction.lang.getString("account_created"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		DatabaseUtils.updatePlayerName(event.getPlayer());
+
 	}
 
 	// Player interact with auction sign

@@ -1,5 +1,8 @@
 package cz.sognus.mineauction;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,6 +16,7 @@ import net.md_5.bungee.api.ChatColor;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -21,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import cz.sognus.mineauction.database.DatabaseUtils;
+import cz.sognus.mineauction.utils.ItemUtils;
 import cz.sognus.mineauction.utils.Log;
 
 public class WebInventory {
@@ -113,8 +118,21 @@ public class WebInventory {
 
 					// Overwrite values
 					is.setAmount(visualQty);
-					is.setDurability(itemDamage);
 					is.addEnchantments(itemEnch);
+					
+					if(ItemUtils.canHaveDamage(is.getTypeId()))
+					{
+						InputStream stream = new ByteArrayInputStream(itemData.getBytes(StandardCharsets.UTF_8));
+						YamlConfiguration yac = YamlConfiguration.loadConfiguration(stream);
+						short dur = (short) yac.getInt("damage");
+						is.setDurability(dur);
+						Bukkit.broadcastMessage("Dur:" +dur);
+						
+					}
+					else
+					{
+						is.setDurability(itemDamage);
+					}
 
 					// Overwrite qty lore
 					ItemMeta im = is.getItemMeta().clone();
@@ -168,25 +186,31 @@ public class WebInventory {
 					DatabaseUtils.getPlayerId(this.player.getUniqueId()))
 					&& wim.getItemStack().getMaxStackSize() > 1) {
 
+				short durability = ItemUtils.canHaveDamage(wim.getId()) ? 0
+						: wim.getDurability();
+
 				ps = conn
 						.prepareStatement("UPDATE ma_items SET qty = qty + ? WHERE playerID = ? AND itemID= ? AND itemDamage = ? AND enchantments = ? AND lore = ?");
 				ps.setInt(1, wim.getItemQty());
 				ps.setInt(2,
 						DatabaseUtils.getPlayerId(this.player.getUniqueId()));
 				ps.setInt(3, wim.getId());
-				ps.setShort(4, wim.getDurability());
+				ps.setShort(4, durability);
 				ps.setString(5, wim.getItemEnchantments());
 				ps.setString(6, wim.getLore());
 
 				ps.executeUpdate();
 			} else {
 
+				short durability = ItemUtils.canHaveDamage(wim.getId()) ? 0
+						: wim.getDurability();
+
 				ps = conn
 						.prepareStatement("INSERT INTO `ma_items` (`playerID`, `itemID`, `itemDamage`, `qty`, `itemMeta`, `enchantments`, `lore`) VALUES (?, ?, ?,?, ?, ?, ?)");
 				ps.setInt(1,
 						DatabaseUtils.getPlayerId(this.player.getUniqueId()));
 				ps.setInt(2, wim.getId());
-				ps.setShort(3, wim.getDurability());
+				ps.setShort(3, durability);
 				ps.setInt(4, wim.getItemQty());
 				ps.setString(5, wim.getItemMeta());
 				ps.setString(6, wim.getItemEnchantments());
@@ -246,10 +270,24 @@ public class WebInventory {
 					is = new ItemStack(Material.getMaterial(itemID), qnty,
 							itemDamage);
 				}
-
+				
 				// Overwrite values
-				is.setDurability(itemDamage);
+				if(ItemUtils.canHaveDamage(is.getTypeId()))
+				{
+					InputStream stream = new ByteArrayInputStream(itemData.getBytes(StandardCharsets.UTF_8));
+					YamlConfiguration yac = YamlConfiguration.loadConfiguration(stream);
+					short dur = (short) yac.getInt("damage");
+					is.setDurability(dur);
+					
+				}
+				else
+				{
+					
+				is.setDurability(itemDamage);				
+				}
+				
 				is.addEnchantments(itemEnch);
+				
 
 				// Update database
 				boolean success = DatabaseUtils.updateItemInDatabase(pl, is,

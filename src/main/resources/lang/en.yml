@@ -4,6 +4,9 @@
 #									
 ################################################################
 
+plugin_disabled_log: "MineAuction is in disabled state, actions will not be logged!"
+
+
 no_permission: "You don't have permission to do that."
 no_cheat: "Hey, don't cheat!"
 no_item_update: "An error occured when withdrawing item from database"
@@ -41,6 +44,6 @@ inventory_title_mailbox: "[MineAuction] MailBox"
 inventory_title_invalid: "Invalid inventory type"
 
 account_created: "MineAuction account created."
-account_passwordchange: "MineAuction password changed."
+account_passwordchange: "Your password has been changed."
 account_register: "You have to create MineAuction account before you can use this sign!"
 

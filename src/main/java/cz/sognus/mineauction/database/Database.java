@@ -3,7 +3,6 @@ package cz.sognus.mineauction.database;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
@@ -58,8 +57,13 @@ public class Database {
 	}
 
 	public Connection getConnection() throws Exception {
-		openConnection();
-		return connection;
+		try {
+			openConnection();
+			return connection;
+		} catch (Exception e) {
+			MineAuction.plugin.onDisable();
+			throw e;
+		}
 	}
 
 	public void closeConnection() {
@@ -95,12 +99,13 @@ public class Database {
 			}
 		}
 
-		String[] queries = CharStreams.toString(
+	    String[] queries = CharStreams.toString(
 				new InputStreamReader(plugin.getResource("create.sql"))).split(
 				";");
 		for (String query : queries) {
 			if (query != null && query != "")
 				s.execute(query);
 		}
+
 	}
 }
