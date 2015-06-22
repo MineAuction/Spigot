@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>cz.sognus.mineauction</groupId>
 	<artifactId>MineAuction</artifactId>
-	<version>${version.release}.${version.major}.${version.minor}-B${buildNumber}</version>
+	<version>${version.release}.${version.major}.${version.minor}</version>
 
 	<scm>
 		<connection>scm:git:git://github.com/Sognus/MineAuction.git</connection>
@@ -12,8 +12,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<version.release>a</version.release>
-		<version.major>3</version.major>
-		<version.minor>4</version.minor>
+		<version.major>4</version.major>
+		<version.minor>0</version.minor>
 		<jdk.version>1.7</jdk.version>
 		<gson.version>2.3.1</gson.version>
 	</properties>
@@ -77,7 +77,7 @@
 			</plugin>
 		</plugins>
 		<!-- Jar name -->
-		<finalName>${project.artifactId}-${version.release}.${version.major}.${version.minor}-B${buildNumber}</finalName>
+		<finalName>${project.artifactId}-${version.release}.${version.major}.${version.minor}-B${buildNumber}-INTERNAL</finalName>
 	</build>
 
 	<repositories>

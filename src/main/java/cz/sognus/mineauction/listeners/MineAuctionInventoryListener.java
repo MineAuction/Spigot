@@ -1,6 +1,7 @@
 package cz.sognus.mineauction.listeners;
 
 import java.sql.ResultSet;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -20,6 +21,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -75,69 +77,41 @@ public class MineAuctionInventoryListener implements Listener {
 	// MineAuction inventory click event
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onInventoryClick(final InventoryClickEvent event) {
-		if (!event.getInventory().getTitle().contains("[MineAuction]"))
+		// Target inventory not belongs to MineAuctions
+		if (!event.getView().getTopInventory().getTitle()
+				.startsWith("[MineAuction]"))
 			return;
-		if (event.getClickedInventory() == null)
+		Bukkit.broadcastMessage("Click event fired!");
+
+		// Player is trying to drop item to ground
+		String[] blackListActions = new String[] { "DROP_ALL_SLOT",
+				"DROP_ONE_SLOT", "DROP_ALL_CURSOR", "DROP_ONE_CURSOR" };
+		String inventoryAction = event.getAction().toString();
+
+		if (Arrays.asList(blackListActions).contains(inventoryAction)) {
+			event.setCancelled(true);
 			return;
 
-		event.setCancelled(true);
-
-		ItemStack is = event.getCurrentItem().clone();
-
-		Inventory inventory = event.getInventory();
-		Inventory clickedInventory = event.getClickedInventory();
-
-		if (clickedInventory.getTitle().startsWith("[MineAuction]")) {
-			// ITEM WITHDRAW
-			// Ignore click if inventory slot contains AIR
-			if (is.getType() == Material.AIR)
-				return;
-
-			WebInventory wi = WebInventory.getInstance(event.getWhoClicked()
-					.getName());
-			
-			// Fix handler for invClick issued after reload
-			if(wi == null)
-			{
-				event.getWhoClicked().closeInventory();
-				return;
-			}
-			
-			try {
-				wi.itemWithdraw(event);
-			} catch (Exception e) {
-
-				e.printStackTrace();
-			}
-			
-		} else {
-			// ITEM DEPOSIT
-			// Ignore click if inventory slot contains AIR
-			if (is.getType() == Material.AIR)
-				return;
-
-			WebInventory wi = WebInventory.getInstance(event.getWhoClicked()
-					.getName());
-			Player p = Bukkit.getPlayer(event.getWhoClicked().getName());
-
-			try {
-				ItemStack istmp = is.clone();
-				if (event.getClick().isShiftClick())
-					istmp.setAmount(1);
-				boolean depositOK = wi.itemDeposit(new WebInventoryMeta(istmp));
-				
-				if(!depositOK) return;
-
-				// Vymazani itemy z inventare
-				WCInventory wci = new WCInventory(p);
-				int output = event.getClick().isShiftClick() ? wci.removeItems(
-						is, 1) : wci.removeItems(is, is.getAmount());
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
 		}
 
-		// event.setCancelled(true);
+		// Determine if action was issued
 
+		Bukkit.getScheduler().runTask(this.plugin, new Runnable() {
+			@Override
+			public void run() {
+				WebInventory wi = WebInventory.getInstance(event
+						.getWhoClicked().getName());
+				wi.manageItemChanges(event.getInventory().getContents());
+			}
+		});
+
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL)
+	public void onItemPickup(PlayerPickupItemEvent event) {
+		String playerName = event.getPlayer().getName();
+		if (WebInventory.getInstance(playerName) != null) {
+			event.setCancelled(true);
+		}
 	}
 }

@@ -7,6 +7,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ public class WebInventory {
 	protected final String inventoryTitle;
 	protected boolean canWithdraw;
 	protected boolean canDeposit;
+	protected ItemStack[] savedData; 
+	
 
 	// Constructor
 	public WebInventory(Player p, String invType) {
@@ -50,6 +53,9 @@ public class WebInventory {
 		this.loadInventory();
 		// this.inventory.setItem(0, new ItemStack(Material.DIAMOND, 64));
 
+		// clone actual data
+		this.savedData = this.inventory.getContents();
+		
 		// open it
 		this.player.openInventory(this.inventory);
 	}
@@ -161,6 +167,7 @@ public class WebInventory {
 
 	public void refreshInventory() {
 		this.loadInventory();
+		this.savedData = this.inventory.getContents();
 		this.player.updateInventory();
 	}
 
@@ -232,87 +239,15 @@ public class WebInventory {
 	}
 
 	@SuppressWarnings({ "deprecation", "unused" })
-	public boolean itemWithdraw(final InventoryClickEvent event)
-			throws Exception {
+	public void itemWithdraw(WebInventoryMeta wim){
 		// Unsupported action
 		if (!this.canWithdraw) {
 			this.player.sendMessage(MineAuction.prefix + ChatColor.RED
 					+ MineAuction.lang.getString("action_invalid_withdraw"));
-			return false;
+			return;
 		}
 
-		ItemStack is = event.getCurrentItem().clone();
-
-		// Item withdraw
-		Player pl = Bukkit.getPlayer(event.getWhoClicked().getName());
-		int qty = event.getClick().isShiftClick() ? 1 : is.getAmount();
-
-		// Get item stack
-		try {
-			ResultSet rs = DatabaseUtils.getItemFromDatabase(is);
-
-			while (rs.next()) {
-				// Get item Data
-				int itemID = rs.getInt("itemID");
-				short itemDamage = rs.getShort("itemDamage");
-				int qnty = rs.getInt("qty");
-				String itemData = rs.getString("itemMeta");
-				Map<Enchantment, Integer> itemEnch = WebInventoryMeta
-						.getItemEnchantmentMap(rs.getString("enchantments"));
-
-				ItemStack stack = null;
-
-				if (itemData != null && itemData != "") {
-					// Yaml metadata
-					is = WebInventoryMeta.getItemStack(itemData);
-				} else {
-					// No yaml metadata
-					is = new ItemStack(Material.getMaterial(itemID), qnty,
-							itemDamage);
-				}
-				
-				// Overwrite values
-				if(ItemUtils.canHaveDamage(is.getTypeId()))
-				{
-					InputStream stream = new ByteArrayInputStream(itemData.getBytes(StandardCharsets.UTF_8));
-					YamlConfiguration yac = YamlConfiguration.loadConfiguration(stream);
-					short dur = (short) yac.getInt("damage");
-					is.setDurability(dur);
-					
-				}
-				else
-				{
-					
-				is.setDurability(itemDamage);				
-				}
-				
-				is.addEnchantments(itemEnch);
-				
-
-				// Update database
-				boolean success = DatabaseUtils.updateItemInDatabase(pl, is,
-						qty);
-
-				// Update player inventory
-				if (!success) {
-					pl.sendMessage(MineAuction.prefix + ChatColor.RED
-							+ MineAuction.lang.getString("no_item_update"));
-					return false;
-				}
-				WCInventory wci = new WCInventory(pl);
-				wci.addItems(is, qty);
-
-				if (MineAuction.config.getBool("plugin.performance.refresh"))
-					this.refreshInventory();
-
-				return true;
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
-
+		// TODO: rewrite item withdraw to item
 	}
 
 	public Inventory getInventory() {
@@ -453,4 +388,46 @@ public class WebInventory {
 		// Null if it fail
 		return null;
 	}
+
+	public void manageItemChanges(ItemStack[] actualContents) {
+		List<ItemStack> missing = new ArrayList<ItemStack>();
+		List<ItemStack> extra = new ArrayList<ItemStack>();
+		
+		List<ItemStack> actualData = Arrays.asList(actualContents);
+		
+		// Items was moved out of inventory
+		for(ItemStack stack : this.savedData)
+		{
+			// Item chybí pokud současná data neobsahují
+			// stejná data jako u uloženého stavu
+			if(!actualData.contains(stack))
+			{
+				missing.add(stack);
+			}
+		}
+		
+		// Items was moved into the inventory
+		for(ItemStack stack2 : actualData)
+		{
+			// Item je navíc pokud uložená data
+			// neobsahují předmět v aktuálních datech
+			if(!Arrays.asList(this.savedData).contains(stack2))
+			{
+				extra.add(stack2);
+				Bukkit.broadcastMessage(stack2.clone().getType().name());
+			}
+		}
+		
+		// Do deposit
+		for(ItemStack itemStack : extra)
+		{
+			WebInventoryMeta wim = new WebInventoryMeta(itemStack);
+			this.itemDeposit(wim);
+		}
+		
+		
+		
+		
+	}
+
 }
