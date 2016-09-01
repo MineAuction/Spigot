@@ -1,15 +1,15 @@
 # MineAuction
 ## Info
-Java part of MineAuction plugin, which is mostly based on old WebAuctionPlus plugin. However our plugin provides more configuration ways at both java and web side.
+Java part of MineAuction plugin, which should have been mostly based on old WebAuctionPlus plugin. However our plugin should have provided more configuration ways at both java and web side.
 
-## Alpha
-MineAuction is in **aplha** state. Major features are slowly being implemented so it is currently not working at all, however, if you find a issue or feature request, feel free to report it. If you want to open new issue, make sure to use latest working build.
+## CANCELED
+MineAuction project has been canceled. Core features that should be pillars of this creation could not be achieved in Bukkit/Spigot. We might rework this idea entirely in future, but don't rely on that.
 
 ## Links
 **Builds:** [link to jenkins service](http://ci.technicraft.cz/job/MineAuction/)
 
 
-**Builds status:** [descriptions of builds stability](http://grief.cz/mabuildstatus)
+**Builds status:** [descriptions of builds stability](http://bit.do/mabuildstatus)
 
 
 **Web part:** [github repository](https://github.com/Sekiphp/MineAuction)
